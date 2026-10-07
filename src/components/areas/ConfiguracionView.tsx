@@ -33,11 +33,15 @@ import {
   Search,
   Eye,
   EyeOff,
-  Activity
+  Activity,
+  HardDrive,
+  Server
 } from 'lucide-react';
 import { AreaType, AnalistaLaboratorio, UserProfile, UserRole, RolUsuarioExt } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { esUsuarioAdminOSoporte } from '../../services/monitoringService';
+import { GoogleIntegrationPanel } from './GoogleIntegrationPanel';
+import { SqlDatabasePanel } from './SqlDatabasePanel';
 
 export interface AreaResponsable {
   id: string;
@@ -53,13 +57,14 @@ export const ConfiguracionView: React.FC = () => {
     analistas,
     analistaActivo,
     limpiarTodosLosDatos,
-    setAreaActual
+    setAreaActual,
+    googleConfig
   } = useQuality();
   const { t } = useLanguage();
   const { theme, toggleTheme, fontSize, setFontSize } = useTheme();
   const [notif, setNotif] = useState<string | null>(null);
   const [storageSize, setStorageSize] = useState<string>("0 KB");
-  const [activeSettingsTab, setActiveSettingsTab] = useState<'usuarios' | 'apariencia' | 'tolerancias' | 'pwa' | 'almacenamiento'>('usuarios');
+  const [activeSettingsTab, setActiveSettingsTab] = useState<'usuarios' | 'apariencia' | 'tolerancias' | 'pwa' | 'almacenamiento' | 'google' | 'sql'>('usuarios');
   const { usuario, usuariosSistema, actualizarEstadoUsuario, eliminarUsuarioSistema, crearUsuarioSistema, actualizarUsuarioSistema } = useAuth();
   
   // Administradores y Soporte Técnico tienen privilegios totales para gestionar y editar TODOS los usuarios
@@ -434,6 +439,42 @@ export const ConfiguracionView: React.FC = () => {
           >
             <Database className="h-4 w-4" />
             <span>LocalStorage y Backups</span>
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => setActiveSettingsTab('google')}
+            className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
+              activeSettingsTab === 'google' 
+                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-md' 
+                : 'text-[#AA9E80] hover:bg-[#2B2B2E] hover:text-white'
+            }`}
+          >
+            <div className="flex items-center space-x-2.5">
+              <HardDrive className="h-4 w-4 text-emerald-400" />
+              <span>Google Drive & Sheets DB</span>
+            </div>
+            {googleConfig?.webAppUrl && (
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" title="Google Workspace Conectado" />
+            )}
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => setActiveSettingsTab('sql')}
+            className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
+              activeSettingsTab === 'sql' 
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-extrabold shadow-md' 
+                : 'text-[#AA9E80] hover:bg-[#2B2B2E] hover:text-white'
+            }`}
+          >
+            <div className="flex items-center space-x-2.5">
+              <Server className="h-4 w-4 text-indigo-400" />
+              <span>Base de Datos SQL</span>
+            </div>
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+              PG
+            </span>
           </button>
 
           {esUsuarioAdminOSoporte(usuario) && (
@@ -1411,6 +1452,16 @@ export const ConfiguracionView: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB 5: GOOGLE WORKSPACE (DRIVE & SHEETS) */}
+          {activeSettingsTab === 'google' && (
+            <GoogleIntegrationPanel />
+          )}
+
+          {/* TAB 6: BASE DE DATOS SQL MAESTRA (POSTGRESQL / SUPABASE) */}
+          {activeSettingsTab === 'sql' && (
+            <SqlDatabasePanel />
           )}
 
         </div>

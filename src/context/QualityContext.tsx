@@ -59,6 +59,14 @@ import {
   obtenerFichasDeLocalStorage,
   limpiarBaseDatosFichasCompleta
 } from '../services/fichasDatabaseService';
+import {
+  obtenerConfiguracionGoogle,
+  guardarConfiguracionGoogle,
+  probarConexionGoogle,
+  inicializarEstructuraGoogle,
+  sincronizarTodoGoogle
+} from '../services/googleDatabaseService';
+import { GoogleIntegrationConfig, GoogleSyncResponse } from '../types/googleIntegration';
 
 interface QualityContextType {
   muestras: MuestraTextil[];
@@ -194,6 +202,14 @@ interface QualityContextType {
   actualizarEvaluacionForrosCosturas: (id: string, datos: Partial<EvaluacionForrosCosturas>) => void;
   eliminarEvaluacionForrosCosturas: (id: string) => void;
   enviarCorreoReporteForrosCosturas: (id: string, destinatario: string, asunto: string, cuerpo: string) => void;
+
+  // 🌐 Integración Google Workspace (Drive & Sheets)
+  googleConfig: GoogleIntegrationConfig;
+  actualizarGoogleConfig: (nueva: Partial<GoogleIntegrationConfig>) => GoogleIntegrationConfig;
+  probarConexionGoogleActiva: (url?: string) => Promise<{ success: boolean; message: string; meta?: any }>;
+  inicializarEstructuraGoogleActiva: () => Promise<GoogleSyncResponse>;
+  sincronizarConGoogleManual: () => Promise<GoogleSyncResponse>;
+  sincronizandoGoogle: boolean;
 }
 
 export const ANALISTAS_PREDETERMINADOS: AnalistaLaboratorio[] = [
@@ -381,6 +397,69 @@ export const QualityProvider: React.FC<{ children: ReactNode }> = ({ children })
     if (guardadas && guardadas.length > 0) return guardadas;
     return MOCK_FICHAS_TECNICAS_HISTORICAS;
   });
+
+  // 🌐 Estado de Integración con Google Workspace
+  const [googleConfig, setGoogleConfig] = useState<GoogleIntegrationConfig>(() => obtenerConfiguracionGoogle());
+  const [sincronizandoGoogle, setSincronizandoGoogle] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleGoogleUpdate = (e: any) => {
+      if (e.detail) setGoogleConfig(e.detail);
+    };
+    window.addEventListener('stflab-google-config-updated', handleGoogleUpdate);
+    return () => window.removeEventListener('stflab-google-config-updated', handleGoogleUpdate);
+  }, []);
+
+  // Sincronización automática no intrusiva hacia Google Sheets cuando cambian telas o accesorios
+  useEffect(() => {
+    if (!googleConfig.autoSyncEnabled || !googleConfig.webAppUrl) return;
+    if (solicitudesTelas.length === 0 && solicitudesAccesorios.length === 0) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        await sincronizarTodoGoogle(solicitudesTelas, solicitudesAccesorios);
+        setGoogleConfig(obtenerConfiguracionGoogle());
+      } catch (e) {
+        console.warn('Auto-sync en segundo plano con Google Sheets:', e);
+      }
+    }, 3500);
+
+    return () => clearTimeout(timer);
+  }, [solicitudesTelas, solicitudesAccesorios, googleConfig.autoSyncEnabled, googleConfig.webAppUrl]);
+
+  const actualizarGoogleConfig = (nueva: Partial<GoogleIntegrationConfig>) => {
+    const act = guardarConfiguracionGoogle(nueva);
+    setGoogleConfig(act);
+    return act;
+  };
+
+  const probarConexionGoogleActiva = async (url?: string) => {
+    const res = await probarConexionGoogle(url);
+    setGoogleConfig(obtenerConfiguracionGoogle());
+    return res;
+  };
+
+  const inicializarEstructuraGoogleActiva = async () => {
+    setSincronizandoGoogle(true);
+    try {
+      const res = await inicializarEstructuraGoogle();
+      setGoogleConfig(obtenerConfiguracionGoogle());
+      return res;
+    } finally {
+      setSincronizandoGoogle(false);
+    }
+  };
+
+  const sincronizarConGoogleManual = async () => {
+    setSincronizandoGoogle(true);
+    try {
+      const res = await sincronizarTodoGoogle(solicitudesTelas, solicitudesAccesorios);
+      setGoogleConfig(obtenerConfiguracionGoogle());
+      return res;
+    } finally {
+      setSincronizandoGoogle(false);
+    }
+  };
 
   // Hidratación e inicialización de la Base de Datos de Fichas Técnicas (IndexedDB + Cloud)
   useEffect(() => {
@@ -1849,7 +1928,13 @@ export const QualityProvider: React.FC<{ children: ReactNode }> = ({ children })
         eliminarSolicitudAccesorios,
         restaurarDePapelera,
         eliminarPermanentePapelera,
-        vaciarPapelera
+        vaciarPapelera,
+        googleConfig,
+        actualizarGoogleConfig,
+        probarConexionGoogleActiva,
+        inicializarEstructuraGoogleActiva,
+        sincronizarConGoogleManual,
+        sincronizandoGoogle
       }}
     >
       {children}

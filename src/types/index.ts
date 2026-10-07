@@ -1023,7 +1023,12 @@ export interface FichaTecnicaHistoricaVersionada extends AuditMetadata {
     urlData?: string;
     fechaCarga: string;
   };
+  enlaceDrive?: string;
+  driveFileId?: string;
+  carpetaDriveId?: string;
+  procesadoConLecturaInteligente?: boolean;
 }
+
 
 // =========================================================================
 // --- 💬 CHAT INTER-ÁREAS & NOTIFICACIONES EN TIEMPO REAL              ---
@@ -1539,5 +1544,9 @@ export interface ItemPapelera {
   motivo?: string;
   datosCompletos: SolicitudTelasCompleta | SolicitudAccesoriosCompleta;
 }
+
+// Integración Google Workspace (Drive & Sheets)
+export * from './googleIntegration';
+
 
 

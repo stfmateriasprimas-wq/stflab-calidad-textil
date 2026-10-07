@@ -13,10 +13,22 @@ import {
   ChevronDown,
   Printer,
   Trash2,
-  RefreshCw
+  RefreshCw,
+  Sparkles,
+  HardDrive,
+  ExternalLink,
+  Layers,
+  Upload,
+  ShieldCheck,
+  ShoppingCart,
+  FlaskConical,
+  CheckCircle2,
+  AlertCircle,
+  ArrowRight
 } from 'lucide-react';
 import { ExploradorFichasModal } from '../fichas-tecnicas/ExploradorFichasModal';
 import { FichaTecnicaFormatoCompletoModal } from '../fichas-tecnicas/FichaTecnicaFormatoCompletoModal';
+import { ModalLecturaInteligenteDrive } from '../fichas-tecnicas/ModalLecturaInteligenteDrive';
 import { exportarFichaAWord, exportarFichaAPDF } from '../../utils/fichaTecnicaFormatters';
 import { 
   STFGroupDocumentSheet, 
@@ -24,6 +36,7 @@ import {
   mapVersionToSTFGroupDocumentData, 
   mapSTFGroupDocumentDataToVersion 
 } from '../fichas-tecnicas/STFGroupDocumentSheet';
+import { CARPETA_OFICIAL_DRIVE_URL, CARPETA_OFICIAL_DRIVE_ID } from '../../utils/textileSmartParser';
 
 export const BibliotecaView: React.FC = () => {
   const { fichasTecnicasHistorial, guardarFichaTecnicaProveedor, limpiarBaseDatosFichas } = useQuality();
@@ -31,16 +44,18 @@ export const BibliotecaView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedFichaId, setSelectedFichaId] = useState<string>('');
   const [showToast, setShowToast] = useState<string | null>(null);
+  const [tabActiva, setTabActiva] = useState<'documento' | 'drive' | 'integracion'>('documento');
 
   const [isModalExploradorOpen, setIsModalExploradorOpen] = useState<boolean>(false);
   const [isModalFormatoCompletoOpen, setIsModalFormatoCompletoOpen] = useState<boolean>(false);
+  const [isModalLecturaDriveOpen, setIsModalLecturaDriveOpen] = useState<boolean>(false);
   const [isExportMenuOpen, setIsExportMenuOpen] = useState<boolean>(false);
   const exportMenuRef = useRef<HTMLDivElement>(null);
 
   const handleLimpiarBaseDatos = async () => {
     const confirmar = window.confirm(
       '¿Confirmas que deseas limpiar la base de datos de la Biblioteca Técnica?\n\n' +
-      'Esta acción eliminará cualquier registro antiguo o simulado y restablecerá la base de datos con la Ficha Técnica Oficial auténtica de STF GROUP (CREPE VICTORIA / TEXTIVISION).'
+      'Esta acción restablecerá la base de datos con la Ficha Técnica Oficial auténtica de STF GROUP (CREPE VICTORIA / TEXTIVISION).'
     );
     if (!confirmar) return;
 
@@ -87,7 +102,7 @@ export const BibliotecaView: React.FC = () => {
 
   const triggerToast = (msg: string) => {
     setShowToast(msg);
-    setTimeout(() => setShowToast(null), 3000);
+    setTimeout(() => setShowToast(null), 3500);
   };
 
   const handleSaveAll = () => {
@@ -166,7 +181,7 @@ export const BibliotecaView: React.FC = () => {
         </div>
       )}
 
-      {/* Header Panel */}
+      {/* Header Panel Principal */}
       <div className="bg-[#2D2D30] p-6 rounded-3xl border border-[#424246] shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-[#FBF8F2]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -183,7 +198,7 @@ export const BibliotecaView: React.FC = () => {
           </p>
         </div>
 
-        {/* Buscador y Botón Explorador */}
+        {/* Buscador y Botones de Acción */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AA9E80]" />
@@ -192,14 +207,38 @@ export const BibliotecaView: React.FC = () => {
               placeholder="Buscar referencia o proveedor..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-[#2B2B2E] border border-[#424246] rounded-xl text-xs text-[#FBF8F2] placeholder-[#AA9E80]/50 focus:outline-none focus:border-[#C6A466] w-full sm:w-64"
+              className="pl-9 pr-4 py-2 bg-[#2B2B2E] border border-[#424246] rounded-xl text-xs text-[#FBF8F2] placeholder-[#AA9E80]/50 focus:outline-none focus:border-[#C6A466] w-full sm:w-52"
             />
           </div>
+
+          {/* Botón Principal: Lectura Inteligente vinculada a Google Drive */}
+          <button
+            type="button"
+            onClick={() => setIsModalLecturaDriveOpen(true)}
+            className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-black px-4 py-2 rounded-xl font-black text-xs flex items-center space-x-2 shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer border border-amber-300 shrink-0"
+            title="Subir y procesar documentos textiles con Lectura Inteligente vinculados a Google Drive"
+          >
+            <Sparkles className="h-4 w-4 text-black animate-pulse" />
+            <span>Lectura Inteligente (Drive)</span>
+          </button>
+
+          {/* Enlace Oficial a la Carpeta de Google Drive */}
+          <a
+            href={CARPETA_OFICIAL_DRIVE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/40 text-blue-300 px-3.5 py-2 rounded-xl font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all shrink-0"
+            title="Abrir la Carpeta Oficial de Fichas Técnicas en Google Drive (1j2VLcwxEur3GNMtP3NIh08ncDtMCqUYA)"
+          >
+            <HardDrive className="h-4 w-4 text-blue-400" />
+            <span>Carpeta Drive</span>
+            <ExternalLink className="h-3 w-3 opacity-70" />
+          </a>
 
           <button
             type="button"
             onClick={() => setIsModalExploradorOpen(true)}
-            className="bg-[#485C3E] hover:bg-[#5A734E] text-white px-4 py-2 rounded-xl font-extrabold text-xs flex items-center space-x-2 shadow-md transition-all cursor-pointer border border-[#94A786]/60"
+            className="bg-[#485C3E] hover:bg-[#5A734E] text-white px-3.5 py-2 rounded-xl font-extrabold text-xs flex items-center space-x-2 shadow-md transition-all cursor-pointer border border-[#94A786]/60 shrink-0"
             title="Abrir Explorador Base Histórica de Fichas Técnicas"
           >
             <BookOpen className="h-4 w-4 text-white" />
@@ -209,18 +248,48 @@ export const BibliotecaView: React.FC = () => {
           <button
             type="button"
             onClick={handleLimpiarBaseDatos}
-            className="bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-700/50 px-3.5 py-2 rounded-xl font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all cursor-pointer"
+            className="bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-700/50 px-3 py-2 rounded-xl font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all cursor-pointer shrink-0"
             title="Limpiar base de datos y purgar datos no oficiales"
           >
             <Trash2 className="h-4 w-4 text-rose-400" />
-            <span>Limpiar Base de Datos</span>
+            <span>Limpiar BD</span>
           </button>
         </div>
       </div>
 
+      {/* Selector rápido de Fichas Técnicas en Base de Datos */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+        <span className="text-[11px] font-bold text-[#AA9E80] uppercase tracking-wider shrink-0 flex items-center gap-1">
+          <Layers className="w-3.5 h-3.5 text-[#C6A466]" /> Fichas Registradas ({filteredFichas.length}):
+        </span>
+        {filteredFichas.map(f => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setSelectedFichaId(f.id)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
+              (currentFicha?.id === f.id)
+                ? 'bg-[#C6A466] text-[#2B2B2E] shadow-md ring-2 ring-amber-400/50'
+                : 'bg-[#2D2D30] text-[#AA9E80] hover:text-[#FBF8F2] hover:bg-[#38383C] border border-[#424246]'
+            }`}
+          >
+            <span>{f.referencia}</span>
+            <span className="text-[10px] opacity-75 font-mono">({f.codigoFT})</span>
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={() => setIsModalLecturaDriveOpen(true)}
+          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span>+ Cargar Ficha desde Drive</span>
+        </button>
+      </div>
+
       {currentFicha && currentVersion && docData ? (
         <>
-          {/* Banner de Acciones y Guardado Superior */}
+          {/* Banner de Identificación y Acciones de la Ficha Activa */}
           <div className="bg-[#2D2D30] border border-[#424246] text-[#FBF8F2] rounded-3xl p-5 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <div className="flex items-center gap-2">
@@ -233,29 +302,48 @@ export const BibliotecaView: React.FC = () => {
                 <span className="text-[10px] bg-[#485C3E]/20 text-[#485C3E] font-bold px-2 py-0.5 rounded-full border border-[#485C3E]/30">
                   P.O: {docData.stfPo || 'N/A'}
                 </span>
+                <span className="text-[10px] bg-blue-500/15 text-blue-300 font-bold px-2 py-0.5 rounded-full border border-blue-400/30 flex items-center gap-1">
+                  <HardDrive className="w-3 h-3 text-blue-400" />
+                  Carpeta LABORATORIO
+                </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
-                <h3 className="text-lg font-serif font-black text-[#FBF8F2] uppercase tracking-wide">
+              <div className="flex flex-wrap items-center gap-2.5 mt-2">
+                <h3 className="text-xl font-serif font-black text-[#FBF8F2] uppercase tracking-wide">
                   {docData.refProv || currentFicha.referencia} • {docData.stfRef}
                 </h3>
+                
+                {/* Botón Ver Formato Completo (Modal) */}
                 <button
                   type="button"
                   onClick={() => setIsModalFormatoCompletoOpen(true)}
                   className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs px-3.5 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-md shadow-amber-500/20 active:scale-95 transition-all cursor-pointer"
-                  title="Ver formato oficial completo de STF GROUP"
+                  title="Ver formato oficial en ventana modal ampliada"
                 >
                   <Eye className="h-3.5 w-3.5 text-zinc-950" />
                   <span>Ver Formato Completo</span>
                 </button>
+
+                {/* Acceso directo a Google Drive para el documento actual */}
+                <a
+                  href={currentFicha.enlaceDrive || CARPETA_OFICIAL_DRIVE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-blue-950/50 hover:bg-blue-900/70 border border-blue-500/40 text-blue-300 font-bold text-xs px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-sm transition-all"
+                  title="Abrir el documento original en Google Drive"
+                >
+                  <HardDrive className="h-3.5 w-3.5 text-blue-400" />
+                  <span>Ver en Google Drive</span>
+                  <ExternalLink className="h-3 w-3" />
+                </a>
               </div>
-              <p className="text-xs text-[#AA9E80] mt-0.5">
+
+              <p className="text-xs text-[#AA9E80] mt-1">
                 Proveedor: <strong className="text-[#C6A466]">{docData.proveedorNombre}</strong> • Origen: <strong className="text-[#FBF8F2]">{docData.paisOrigen}</strong>
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              
               {/* Botón Guardar Cambios */}
               <button
                 type="button"
@@ -337,9 +425,276 @@ export const BibliotecaView: React.FC = () => {
                   </div>
                 )}
               </div>
-
             </div>
           </div>
+
+          {/* Tarjetas de Resumen de Especificaciones Clave */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="bg-[#2D2D30] border border-[#424246] rounded-2xl p-3.5 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-[#AA9E80] block">Composición</span>
+              <span className="text-xs font-black text-white block truncate" title={`${docData.comp1Pct}% ${docData.comp1Nombre}`}>
+                {docData.comp1Nombre ? `${docData.comp1Pct}% ${docData.comp1Nombre}` : '100% POLIESTER'}
+              </span>
+            </div>
+
+            <div className="bg-[#2D2D30] border border-[#424246] rounded-2xl p-3.5 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-[#AA9E80] block">Gramaje</span>
+              <span className="text-xs font-black text-amber-300 font-mono block">
+                {docData.pesoGsm || '0'} g/m²
+              </span>
+            </div>
+
+            <div className="bg-[#2D2D30] border border-[#424246] rounded-2xl p-3.5 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-[#AA9E80] block">Ancho Cortable</span>
+              <span className="text-xs font-black text-emerald-300 font-mono block">
+                {docData.anchoCortableCms || docData.anchoCms || '0'} cm
+              </span>
+            </div>
+
+            <div className="bg-[#2D2D30] border border-[#424246] rounded-2xl p-3.5 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-[#AA9E80] block">Color / Tono</span>
+              <span className="text-xs font-black text-white block truncate">
+                {docData.color || '000 ESTÁNDAR'}
+              </span>
+            </div>
+
+            <div className="bg-[#2D2D30] border border-[#424246] rounded-2xl p-3.5 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-[#AA9E80] block">P.O. Number</span>
+              <span className="text-xs font-black text-[#C6A466] font-mono block">
+                {docData.stfPo || 'N/A'}
+              </span>
+            </div>
+
+            <div className="bg-[#2D2D30] border border-[#424246] rounded-2xl p-3.5 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-[#AA9E80] block">Google Drive</span>
+              <span className="text-xs font-black text-cyan-300 block truncate flex items-center gap-1">
+                <HardDrive className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span>Carpeta Vinculada</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Barra de Pestañas de la Biblioteca */}
+          <div className="flex flex-wrap items-center gap-2 border-b border-[#424246] pb-2">
+            <button
+              type="button"
+              onClick={() => setTabActiva('documento')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
+                tabActiva === 'documento'
+                  ? 'bg-[#C6A466] text-[#2B2B2E] shadow-md'
+                  : 'bg-[#2D2D30] text-[#AA9E80] hover:text-[#FBF8F2] border border-[#424246]'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>1. Formato Oficial STF GROUP (12 Secciones)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTabActiva('drive')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
+                tabActiva === 'drive'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-[#2D2D30] text-[#AA9E80] hover:text-[#FBF8F2] border border-[#424246]'
+              }`}
+            >
+              <HardDrive className="w-4 h-4 text-blue-400" />
+              <span>2. Carpeta Google Drive (LABORATORIO)</span>
+              <span className="text-[10px] bg-blue-500/30 text-blue-200 px-2 py-0.5 rounded-full border border-blue-400/30">
+                1j2VLcwxEur3GNMtP3NIh08ncDtMCqUYA
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTabActiva('integracion')}
+              className={`px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
+                tabActiva === 'integracion'
+                  ? 'bg-emerald-600 text-white shadow-md'
+                  : 'bg-[#2D2D30] text-[#AA9E80] hover:text-[#FBF8F2] border border-[#424246]'
+              }`}
+            >
+              <RefreshCw className="w-4 h-4 text-emerald-400" />
+              <span>3. Alimentación de Otros Apartados (Compras / Lab)</span>
+            </button>
+          </div>
+
+          {/* CONTENIDO DE PESTAÑA 1: Formato Oficial STF GROUP Renderizado en Pantalla */}
+          {tabActiva === 'documento' && (
+            <div className="space-y-4">
+              <div className="overflow-x-auto bg-[#1e232f]/80 p-3 sm:p-5 rounded-3xl border border-[#424246] shadow-inner">
+                <STFGroupDocumentSheet
+                  data={docData}
+                  editable={true}
+                  onChange={handleDocumentChange}
+                />
+              </div>
+
+              {/* Botón Guardar Inferior */}
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={handleSaveAll}
+                  className="bg-[#C6A466] hover:bg-[#D6CDB8] text-[#2B2B2E] font-black text-xs uppercase tracking-wider py-3 px-6 rounded-xl flex items-center space-x-2 shadow-lg transition-all active:scale-95 cursor-pointer"
+                >
+                  <Save className="h-4 w-4" />
+                  <span>Guardar Cambios en Base de Datos de Fichas Técnicas</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* CONTENIDO DE PESTAÑA 2: Panel de Google Drive */}
+          {tabActiva === 'drive' && (
+            <div className="bg-[#2D2D30] border border-[#424246] rounded-3xl p-6 space-y-6 text-[#FBF8F2]">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-[#424246] pb-5">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <h4 className="text-base font-bold text-white uppercase tracking-wide">
+                      Carpeta Oficial Conectada: LABORATORIO
+                    </h4>
+                    <span className="text-[10px] bg-blue-500/20 text-blue-300 font-mono px-2 py-0.5 rounded-full border border-blue-400/30">
+                      ID: {CARPETA_OFICIAL_DRIVE_ID}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#AA9E80]">
+                    Esta carpeta almacena los archivos originales (PDF, Excel, Word, imágenes) y alimenta la lectura inteligente del sistema.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href={CARPETA_OFICIAL_DRIVE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md transition-all cursor-pointer"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Abrir en Google Drive</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsModalLecturaDriveOpen(true)}
+                    className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-black text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4 text-zinc-950" />
+                    <span>Subir y Procesar con IA</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Zona de Dropzone directa para subir a la carpeta */}
+              <div 
+                onClick={() => setIsModalLecturaDriveOpen(true)}
+                className="border-2 border-dashed border-amber-500/40 hover:border-amber-400 rounded-3xl p-8 text-center cursor-pointer transition-all bg-amber-500/5 hover:bg-amber-500/10 space-y-3"
+              >
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center border border-amber-500/40">
+                  <Upload className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <h5 className="text-sm font-black text-white uppercase tracking-wide">
+                    Arrastra o adjunta una Ficha Técnica para subirla a la Carpeta de Drive
+                  </h5>
+                  <p className="text-xs text-[#AA9E80]">
+                    Sube PDF de Textivision, Lafayette, Vicunha, hojas de cálculo Excel o imágenes escaneadas. La IA extraerá los datos automáticamente.
+                  </p>
+                </div>
+                <span className="inline-block text-xs font-bold bg-amber-500 text-zinc-950 px-4 py-1.5 rounded-xl shadow-md">
+                  Abrir Asistente de Lectura Inteligente
+                </span>
+              </div>
+
+              {/* Documento actual vinculado */}
+              <div className="bg-[#242A38] border border-blue-500/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs border border-blue-400/30">
+                    PDF
+                  </div>
+                  <div>
+                    <h6 className="text-xs font-bold text-white">
+                      {currentFicha.documentoOriginal?.nombreArchivo || 'ESPECIFICACIONES_TECNICAS_CREPE_VICTORIA_TEXTIVISION.pdf'}
+                    </h6>
+                    <span className="text-[10px] text-[#AA9E80]">
+                      Vinculado a: {currentFicha.referencia} • {currentFicha.proveedor}
+                    </span>
+                  </div>
+                </div>
+
+                <a
+                  href={currentFicha.enlaceDrive || CARPETA_OFICIAL_DRIVE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-300 hover:text-white font-bold flex items-center gap-1.5 underline"
+                >
+                  <span>Abrir Documento</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* CONTENIDO DE PESTAÑA 3: Alimentación a Otros Apartados */}
+          {tabActiva === 'integracion' && (
+            <div className="bg-[#2D2D30] border border-[#424246] rounded-3xl p-6 space-y-6 text-[#FBF8F2]">
+              <div className="space-y-1 border-b border-[#424246] pb-4">
+                <h4 className="text-base font-bold text-white uppercase tracking-wide flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 text-emerald-400" />
+                  <span>Flujo de Alimentación de la Base de Datos a Otros Módulos</span>
+                </h4>
+                <p className="text-xs text-[#AA9E80]">
+                  Los datos leídos de Google Drive quedan consolidados aquí en la Biblioteca Técnica y alimentan automáticamente los siguientes procesos de STF GROUP:
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Módulo 1: Compras */}
+                <div className="bg-[#242A38] border border-cyan-500/30 rounded-2xl p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-cyan-300 font-black text-sm uppercase">
+                      <ShoppingCart className="w-5 h-5" />
+                      <span>1. Módulo de Compras (Telas)</span>
+                    </div>
+                    <span className="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-400/30">
+                      Sincronizado
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#AA9E80]">
+                    Al generar una orden de compra o requisición para <strong>{docData.refProv || currentFicha.referencia}</strong>:
+                  </p>
+                  <ul className="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
+                    <li>Autocompleta el proveedor oficial: <span className="text-white font-bold">{docData.proveedorNombre}</span></li>
+                    <li>Fija el ancho útil contratado: <span className="text-emerald-300 font-bold">{docData.anchoCortableCms || docData.anchoCms} cm</span></li>
+                    <li>Establece el gramaje nominal de compra: <span className="text-amber-300 font-bold">{docData.pesoGsm} g/m²</span></li>
+                    <li>Bloquea errores en la composición declarada: <span className="text-white font-bold">{docData.comp1Pct}% {docData.comp1Nombre}</span></li>
+                  </ul>
+                </div>
+
+                {/* Módulo 2: Laboratorio */}
+                <div className="bg-[#242A38] border border-emerald-500/30 rounded-2xl p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-emerald-300 font-black text-sm uppercase">
+                      <FlaskConical className="w-5 h-5" />
+                      <span>2. Módulo de Laboratorio (Ensayos Físicos)</span>
+                    </div>
+                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-400/30">
+                      Sincronizado
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#AA9E80]">
+                    Al ingresar una muestra física del lote <strong>{docData.lotes || 'Producción'}</strong> para análisis de calidad:
+                  </p>
+                  <ul className="text-xs text-zinc-300 space-y-1.5 list-disc list-inside">
+                    <li>Compara el peso real medido en balanza contra <span className="text-amber-300 font-bold">{docData.pesoGsm} g/m²</span> (±5%).</li>
+                    <li>Evalúa el cambio dimensional al lavado con la tolerancia de la ficha: <span className="text-emerald-300 font-bold">{docData.cambioDimTrama} ({docData.cambioDimTol || '±3%'})</span>.</li>
+                    <li>Dictamina la solidez al frote seco/húmedo contra la norma declarada: <span className="text-white font-bold">{docData.solFroteRes}</span>.</li>
+                    <li>Valida la resistencia al rasgado y tracción sin inventar tolerancias.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <div className="p-12 text-center bg-[#2D2D30] rounded-3xl border border-[#424246] text-[#AA9E80] text-xs">
@@ -358,7 +713,7 @@ export const BibliotecaView: React.FC = () => {
       />
 
       {/* Modal de Formato Completo STF GROUP */}
-      {isModalFormatoCompletoOpen && currentFicha && (
+      {isModalFormatoCompletoOpen && currentFicha && currentVersion && (
         <FichaTecnicaFormatoCompletoModal
           ficha={currentFicha}
           version={currentVersion}
@@ -367,12 +722,24 @@ export const BibliotecaView: React.FC = () => {
             setDocData(updatedDocData);
             const versionActualizada = mapSTFGroupDocumentDataToVersion(currentVersion, updatedDocData);
             guardarFichaTecnicaProveedor(currentFicha, versionActualizada);
-            alert(`✅ Formato oficial de ${currentFicha.referencia} actualizado exitosamente.`);
+            triggerToast(`Formato oficial de ${currentFicha.referencia} actualizado exitosamente.`);
           }}
           onCerrar={() => setIsModalFormatoCompletoOpen(false)}
         />
       )}
 
+      {/* Modal de Lectura Inteligente & Google Drive */}
+      <ModalLecturaInteligenteDrive
+        isOpen={isModalLecturaDriveOpen}
+        onClose={() => setIsModalLecturaDriveOpen(false)}
+        onFichaCreada={(fichaId) => {
+          setSelectedFichaId(fichaId);
+          triggerToast('✓ Ficha Técnica analizada e incorporada a la Biblioteca Técnica.');
+        }}
+      />
+
     </div>
   );
 };
+
+

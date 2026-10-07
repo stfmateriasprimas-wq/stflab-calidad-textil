@@ -1,0 +1,631 @@
+/**
+ * =========================================================================================
+ * STFLAB - SISTEMA DE BASE DE DATOS EN GOOGLE SHEETS & GOOGLE DRIVE
+ * STF GROUP S.A. (Studio F, ELA, STF MAN)
+ * =========================================================================================
+ * 
+ * Este script actúa como la API Backend Serverless en Google Workspace para STFLab.
+ * Permite:
+ * 1. Sincronizar y persistir Solicitudes de Telas y Accesorios / Insumos en Google Sheets.
+ * 2. Almacenar y organizar archivos adjuntos (PDFs de Fichas Técnicas, fotos de ensayos) en Google Drive.
+ * 3. Proporcionar enlaces públicos o compartidos de Drive directamente en la aplicación.
+ * 
+ * GUÍA RÁPIDA DE INSTALACIÓN Y DESPLIEGUE:
+ * 1. Entra a Google Drive (https://drive.google.com) con tu cuenta corporativa.
+ * 2. Crea una Hoja de Cálculo nueva llamada "STFLAB - Base de Datos Calidad Textil".
+ * 3. En el menú superior de la hoja, haz clic en: Extensiones > Apps Script.
+ * 4. Borra todo el código que aparezca y pega TODO este archivo.
+ * 5. Haz clic en "Guardar" (ícono de disquete).
+ * 6. Haz clic en "Implementar" (botón azul arriba a la derecha) > "Nueva implementación".
+ * 7. Selecciona el tipo (ícono de engranaje) > "Aplicación web".
+ * 8. Configura:
+ *    - Descripción: "STFLAB API v1"
+ *    - Ejecutar como: "Yo" (tu cuenta de correo)
+ *    - Quién tiene acceso: "Cualquier usuario" (Anyone) -> IMPORTANTE para permitir que la app envíe datos.
+ * 9. Haz clic en "Implementar" y autoriza los permisos requeridos de Google.
+ * 10. Copia la "URL de la aplicación web" (termina en /exec) y pégala en STFLAB > Configuración > Google Workspace.
+ * =========================================================================================
+ */
+
+// Constantes de configuración
+var NOMBRE_HOJA_CALCULO = "STFLAB - Base de Datos Calidad Textil";
+var NOMBRE_CARPETA_RAIZ = "STFLAB_Calidad_Textil";
+var SUB_CARPETA_FICHAS = "01_Fichas_Tecnicas";
+var SUB_CARPETA_ENSAYOS = "02_Ensayos_Fotos";
+var SUB_CARPETA_SOLICITUDES = "03_Solicitudes_Adjuntos";
+
+// Carpeta Oficial Vinculada de Google Drive para Biblioteca Técnica
+var CARPETA_BIBLIOTECA_DEFAULT_ID = "1j2VLcwxEur3GNMtP3NIh08ncDtMCqUYA";
+
+var HOJA_TELAS = "SOLICITUDES_TELAS";
+var HOJA_ACCESORIOS = "SOLICITUDES_ACCESORIOS";
+var HOJA_FICHAS = "FICHAS_TECNICAS";
+var HOJA_AUDITORIA = "AUDITORIA_LOGS";
+
+/**
+ * Manejador de peticiones GET (Ping y lectura)
+ */
+function doGet(e) {
+  try {
+    var params = (e && e.parameter) || {};
+    var action = params.action || 'ping';
+
+    if (action === 'ping') {
+      return handlePing();
+    }
+    if (action === 'getData') {
+      return handleGetAllData();
+    }
+    if (action === 'listFolder') {
+      return handleListDriveFolder(params);
+    }
+
+    return createJsonResponse({
+      success: true,
+      message: "API Google Apps Script de STFLab activa y respondiendo correctamente.",
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    return createJsonResponse({
+      success: false,
+      error: err.toString()
+    });
+  }
+}
+
+/**
+ * Manejador de peticiones POST (Inserción, sincronización, subida de archivos)
+ */
+function doPost(e) {
+  try {
+    var contents = e.postData ? e.postData.contents : '{}';
+    var payload = {};
+    try {
+      payload = JSON.parse(contents);
+    } catch (parseErr) {
+      return createJsonResponse({
+        success: false,
+        error: "Error al decodificar JSON del cuerpo de la petición: " + parseErr.toString()
+      });
+    }
+
+    var action = payload.action || 'ping';
+
+    if (action === 'ping') {
+      return handlePing();
+    } else if (action === 'initStructure') {
+      return handleInitStructure();
+    } else if (action === 'syncTelas') {
+      return handleSyncTelas(payload.data);
+    } else if (action === 'syncAccesorios') {
+      return handleSyncAccesorios(payload.data);
+    } else if (action === 'syncAll') {
+      return handleSyncAll(payload.data);
+    } else if (action === 'uploadFile') {
+      return handleUploadFile(payload);
+    } else if (action === 'getAllData') {
+      return handleGetAllData();
+    } else if (action === 'listDriveFolder') {
+      return handleListDriveFolder(payload);
+    } else if (action === 'readDriveFile') {
+      return handleReadDriveFile(payload);
+    } else {
+      return createJsonResponse({
+        success: false,
+        error: "Acción no reconocida: " + action
+      });
+    }
+  } catch (err) {
+    return createJsonResponse({
+      success: false,
+      error: err.toString(),
+      stack: err.stack
+    });
+  }
+}
+
+
+/**
+ * Responde con Ping y metadatos de conexión
+ */
+function handlePing() {
+  var ss = getOrCreateSpreadsheet();
+  var rootFolder = getOrCreateRootFolder();
+  var userEmail = Session.getActiveUser().getEmail() || Session.getEffectiveUser().getEmail();
+
+  return createJsonResponse({
+    success: true,
+    message: "Conexión exitosa con Google Workspace STFLab",
+    timestamp: new Date().toISOString(),
+    spreadsheetId: ss.getId(),
+    spreadsheetUrl: ss.getUrl(),
+    rootFolderId: rootFolder.getId(),
+    rootFolderUrl: rootFolder.getUrl(),
+    userEmail: userEmail
+  });
+}
+
+/**
+ * Inicializa la estructura de hojas y carpetas en Drive con formato profesional
+ */
+function handleInitStructure() {
+  var ss = getOrCreateSpreadsheet();
+  var rootFolder = getOrCreateRootFolder();
+  var fichasFolder = getOrCreateSubFolder(rootFolder, SUB_CARPETA_FICHAS);
+  var ensayosFolder = getOrCreateSubFolder(rootFolder, SUB_CARPETA_ENSAYOS);
+  var solFolder = getOrCreateSubFolder(rootFolder, SUB_CARPETA_SOLICITUDES);
+
+  // Inicializar pestañas con encabezados y estilos corporativos STF
+  setupSheetHeaders(ss, HOJA_TELAS, [
+    "ID_SOLICITUD", "NUMERO_SOLICITUD", "FECHA_SOLICITUD", "SOLICITANTE", "PROVEEDOR",
+    "ORDEN_COMPRA", "ESTADO_FLUJO", "ID_TELA", "SOLICITUD_COMPRA", "REFERENCIA",
+    "COLOR", "OC_COL", "OBSERVACION", "DICTAMEN_LAB", "RESULTADO_LAB",
+    "RESPONSABLE_LAB", "FECHA_RESPUESTA_LAB", "DECISION_COMPRA", "FECHA_DECISION_COMPRA",
+    "RESPONSABLE_COMPRA", "DESCUENTO_NEGOCIADO", "ARCHIVO_ADJUNTO_URL", "FECHA_SINCRONIZACION"
+  ]);
+
+  setupSheetHeaders(ss, HOJA_ACCESORIOS, [
+    "ID_SOLICITUD", "NUMERO_SOLICITUD", "FECHA_SOLICITUD", "SOLICITANTE", "PROVEEDOR",
+    "PRIORIDAD", "ESTADO_FLUJO", "ID_MUESTRA", "REFERENCIA", "COLOR",
+    "TALLA", "CANTIDAD_QTY", "DESCRIPCION_INSUMO", "DICTAMEN_LAB", "RESULTADO_LAB",
+    "OBSERVACION_LAB", "RESPONSABLE_LAB", "FECHA_RESPUESTA", "CALIFICACION",
+    "ARCHIVO_ADJUNTO_URL", "FECHA_SINCRONIZACION"
+  ]);
+
+  setupSheetHeaders(ss, HOJA_FICHAS, [
+    "ID_FICHA", "CODIGO_FT", "REFERENCIA", "PROVEEDOR", "REF_PROVEEDOR",
+    "COMPOSICION", "PESO_G_M2", "ANCHO_UTIL_CM", "TIPO_TEJIDO", "VERSION_ACTUAL",
+    "FECHA_VERSION", "USUARIO_CREADOR", "URL_DRIVE_ARCHIVO", "FECHA_SINCRONIZACION"
+  ]);
+
+  setupSheetHeaders(ss, HOJA_AUDITORIA, [
+    "ID_LOG", "FECHA", "HORA", "COLECCION", "DOCUMENTO_ID",
+    "ACCION", "USUARIO", "ROL", "AREA", "DETALLES", "CAMPO_AFECTADO"
+  ]);
+
+  return createJsonResponse({
+    success: true,
+    message: "Estructura de Google Sheets y Google Drive inicializada con éxito.",
+    spreadsheetId: ss.getId(),
+    spreadsheetUrl: ss.getUrl(),
+    rootFolderId: rootFolder.getId(),
+    rootFolderUrl: rootFolder.getUrl(),
+    fichasFolderUrl: fichasFolder.getUrl(),
+    ensayosFolderUrl: ensayosFolder.getUrl(),
+    solicitudesFolderUrl: solFolder.getUrl()
+  });
+}
+
+/**
+ * Sincroniza Solicitudes de Telas (Upsert / Reemplazo completo)
+ */
+function handleSyncTelas(data) {
+  if (!data || !Array.isArray(data)) {
+    return createJsonResponse({ success: false, error: "Datos de telas inválidos o vacíos" });
+  }
+
+  var ss = getOrCreateSpreadsheet();
+  var sheet = ss.getSheetByName(HOJA_TELAS);
+  if (!sheet) {
+    handleInitStructure();
+    sheet = ss.getSheetByName(HOJA_TELAS);
+  }
+
+  var rows = [];
+  var timestamp = new Date().toLocaleString("es-CO");
+
+  data.forEach(function(sol) {
+    var telas = (sol.telas && sol.telas.length > 0) ? sol.telas : [{}];
+    telas.forEach(function(tela) {
+      rows.push([
+        sol.id || '',
+        sol.numeroSolicitud || '',
+        sol.fechaSolicitud || '',
+        sol.solicitante || '',
+        sol.proveedor || tela.proveedor || '',
+        sol.ordenCompra || tela.ocCol || '',
+        sol.estadoFlujo || '',
+        tela.id || '',
+        tela.solicitudCompra || '',
+        tela.referencia || '',
+        tela.color || '',
+        tela.ocCol || '',
+        tela.observacion || sol.observacionesGenerales || '',
+        tela.dictamen || sol.dictamenGlobal || 'PENDIENTE',
+        tela.resultadoLab || '',
+        tela.responsableLab || '',
+        tela.fechaRespuestaLab || tela.fechaEntrega || '',
+        (tela.decisionCompra && tela.decisionCompra.decision) || 'PENDIENTE',
+        (tela.decisionCompra && tela.decisionCompra.fechaDecision) || '',
+        (tela.decisionCompra && tela.decisionCompra.responsable) || '',
+        (tela.decisionCompra && tela.decisionCompra.descuentoNegociadoPorc) || '',
+        (sol.documentoOriginal && sol.documentoOriginal.urlData) || '',
+        timestamp
+      ]);
+    });
+  });
+
+  // Limpiar datos anteriores (excepto encabezado) e insertar filas actualizadas
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent();
+  }
+
+  if (rows.length > 0) {
+    sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
+  }
+
+  return createJsonResponse({
+    success: true,
+    message: "Sincronización de solicitudes de telas completada exitosamente.",
+    telasProcesadas: rows.length,
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Sincroniza Solicitudes de Accesorios / Insumos
+ */
+function handleSyncAccesorios(data) {
+  if (!data || !Array.isArray(data)) {
+    return createJsonResponse({ success: false, error: "Datos de accesorios inválidos o vacíos" });
+  }
+
+  var ss = getOrCreateSpreadsheet();
+  var sheet = ss.getSheetByName(HOJA_ACCESORIOS);
+  if (!sheet) {
+    handleInitStructure();
+    sheet = ss.getSheetByName(HOJA_ACCESORIOS);
+  }
+
+  var rows = [];
+  var timestamp = new Date().toLocaleString("es-CO");
+
+  data.forEach(function(sol) {
+    var muestras = (sol.muestras && sol.muestras.length > 0) ? sol.muestras : [{}];
+    muestras.forEach(function(m) {
+      var calif = (m.reporteEvaluacion && m.reporteEvaluacion.calificacion) || '';
+      rows.push([
+        sol.id || '',
+        sol.numeroSolicitud || '',
+        sol.fechaSolicitud || '',
+        sol.solicitante || '',
+        sol.proveedor || '',
+        sol.prioridad || 'Normal',
+        sol.estadoFlujo || '',
+        m.id || '',
+        m.referencia || '',
+        m.color || '',
+        m.talla || '',
+        m.qty || '',
+        m.descripcionInsumo || '',
+        m.dictamen || 'PENDIENTE',
+        m.resultado || '',
+        m.observacion || '',
+        m.responsableLab || '',
+        m.fechaRespuestaACompras || m.fechaEntrega || '',
+        calif,
+        (sol.documentoOriginal && sol.documentoOriginal.urlData) || '',
+        timestamp
+      ]);
+    });
+  });
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent();
+  }
+
+  if (rows.length > 0) {
+    sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
+  }
+
+  return createJsonResponse({
+    success: true,
+    message: "Sincronización de solicitudes de accesorios completada.",
+    accesoriosProcesados: rows.length,
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Sincroniza tanto Telas como Accesorios en una sola operación
+ */
+function handleSyncAll(data) {
+  if (!data) return createJsonResponse({ success: false, error: "Sin datos para sincronizar" });
+
+  var respTelas = data.telas ? handleSyncTelas(data.telas) : null;
+  var respAcc = data.accesorios ? handleSyncAccesorios(data.accesorios) : null;
+
+  return createJsonResponse({
+    success: true,
+    message: "Sincronización total con Google Sheets ejecutada exitosamente.",
+    telas: respTelas ? JSON.parse(respTelas.getContent()) : null,
+    accesorios: respAcc ? JSON.parse(respAcc.getContent()) : null,
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Almacena archivos adjuntos (PDFs, fotos, documentos) en carpetas de Google Drive
+ */
+function handleUploadFile(payload) {
+  var fileName = payload.fileName || ("STFLab_Archivo_" + new Date().getTime());
+  var mimeType = payload.mimeType || "application/octet-stream";
+  var base64Data = payload.base64Data || "";
+  var folderCategory = payload.folderCategory || "general"; // 'fichas' | 'ensayos' | 'solicitudes'
+  var targetFolderId = payload.targetFolderId || CARPETA_BIBLIOTECA_DEFAULT_ID;
+
+  if (!base64Data) {
+    return createJsonResponse({ success: false, error: "No se proporcionó el contenido base64 del archivo" });
+  }
+
+  var targetFolder = null;
+  // 1. Si se especificó un ID de carpeta puntual (como la carpeta vinculada de Biblioteca Técnica)
+  if (targetFolderId) {
+    try {
+      targetFolder = DriveApp.getFolderById(targetFolderId);
+    } catch (fErr) {
+      targetFolder = null;
+    }
+  }
+
+  // 2. Si no se encontró por ID, resolver según categoría en la carpeta raíz
+  if (!targetFolder) {
+    var rootFolder = getOrCreateRootFolder();
+    targetFolder = rootFolder;
+    if (folderCategory === 'fichas') {
+      targetFolder = getOrCreateSubFolder(rootFolder, SUB_CARPETA_FICHAS);
+    } else if (folderCategory === 'ensayos') {
+      targetFolder = getOrCreateSubFolder(rootFolder, SUB_CARPETA_ENSAYOS);
+    } else if (folderCategory === 'solicitudes') {
+      targetFolder = getOrCreateSubFolder(rootFolder, SUB_CARPETA_SOLICITUDES);
+    }
+  }
+
+  // Decodificar Base64 y crear archivo en Google Drive
+  var decodedBytes = Utilities.base64Decode(base64Data);
+  var blob = Utilities.newBlob(decodedBytes, mimeType, fileName);
+  var file = targetFolder.createFile(blob);
+
+  // Hacer el archivo visible mediante enlace
+  try {
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  } catch (shareErr) {
+    try {
+      file.setSharing(DriveApp.Access.DOMAIN_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (e2) {}
+  }
+
+  var fileId = file.getId();
+  var fileUrl = file.getUrl();
+  var downloadUrl = "https://drive.google.com/uc?export=download&id=" + fileId;
+  var previewUrl = "https://drive.google.com/file/d/" + fileId + "/preview";
+
+  return createJsonResponse({
+    success: true,
+    message: "Archivo subido exitosamente a Google Drive.",
+    fileId: fileId,
+    fileName: fileName,
+    fileUrl: fileUrl,
+    downloadUrl: downloadUrl,
+    previewUrl: previewUrl,
+    folderId: targetFolder.getId(),
+    folderName: targetFolder.getName(),
+    folderCategory: folderCategory
+  });
+}
+
+/**
+ * Lista todos los archivos de una carpeta de Google Drive (por defecto la de Biblioteca Técnica)
+ */
+function handleListDriveFolder(payload) {
+  var folderId = (payload && payload.folderId) || CARPETA_BIBLIOTECA_DEFAULT_ID;
+  try {
+    var rootFolder = DriveApp.getFolderById(folderId);
+    var filesList = [];
+    var subfoldersList = [];
+
+    // 1. Archivos en la carpeta actual
+    var filesIter = rootFolder.getFiles();
+    while (filesIter.hasNext()) {
+      var f = filesIter.next();
+      filesList.push({
+        id: f.getId(),
+        name: f.getName(),
+        mimeType: f.getMimeType(),
+        size: f.getSize(),
+        url: f.getUrl(),
+        downloadUrl: "https://drive.google.com/uc?export=download&id=" + f.getId(),
+        updated: f.getLastUpdated().toISOString(),
+        folderId: rootFolder.getId(),
+        folderName: rootFolder.getName(),
+        year: extractYearFromText(f.getName()) || extractYearFromText(rootFolder.getName()) || 'Raíz'
+      });
+    }
+
+    // 2. Subcarpetas (Años, Fichas Técnicas Base, etc.)
+    var foldersIter = rootFolder.getFolders();
+    while (foldersIter.hasNext()) {
+      var sub = foldersIter.next();
+      var yearMatch = extractYearFromText(sub.getName());
+      
+      // Contar archivos de la subcarpeta
+      var subFiles = sub.getFiles();
+      var count = 0;
+      while (subFiles.hasNext()) {
+        var subF = subFiles.next();
+        count++;
+        // Incluir también los archivos de la subcarpeta en la lista global
+        filesList.push({
+          id: subF.getId(),
+          name: subF.getName(),
+          mimeType: subF.getMimeType(),
+          size: subF.getSize(),
+          url: subF.getUrl(),
+          downloadUrl: "https://drive.google.com/uc?export=download&id=" + subF.getId(),
+          updated: subF.getLastUpdated().toISOString(),
+          folderId: sub.getId(),
+          folderName: sub.getName(),
+          year: yearMatch || extractYearFromText(subF.getName()) || 'General'
+        });
+      }
+
+      subfoldersList.push({
+        id: sub.getId(),
+        name: sub.getName(),
+        url: sub.getUrl(),
+        year: yearMatch,
+        fileCount: count
+      });
+    }
+
+    return createJsonResponse({
+      success: true,
+      folderId: folderId,
+      folderName: rootFolder.getName(),
+      folderUrl: rootFolder.getUrl(),
+      folders: subfoldersList,
+      files: filesList,
+      totalFiles: filesList.length,
+      totalFolders: subfoldersList.length
+    });
+  } catch (err) {
+    return createJsonResponse({
+      success: false,
+      error: "Error accediendo a la carpeta de Google Drive (" + folderId + "): " + err.toString()
+    });
+  }
+}
+
+/**
+ * Función auxiliar para detectar años en nombres de carpetas o archivos (ej. 2022, 2023, 2024, 2025, 2026)
+ */
+function extractYearFromText(text) {
+  if (!text) return null;
+  var match = text.match(/(202[0-9])/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Lee el contenido codificado en Base64 de un archivo en Google Drive para procesarlo con Lectura Inteligente
+ */
+function handleReadDriveFile(payload) {
+  var fileId = payload && payload.fileId;
+  if (!fileId) {
+    return createJsonResponse({ success: false, error: "ID de archivo no especificado" });
+  }
+
+  try {
+    var file = DriveApp.getFileById(fileId);
+    var blob = file.getBlob();
+    var bytes = blob.getBytes();
+    var base64Data = Utilities.base64Encode(bytes);
+
+    return createJsonResponse({
+      success: true,
+      fileId: fileId,
+      fileName: file.getName(),
+      mimeType: file.getMimeType(),
+      size: file.getSize(),
+      url: file.getUrl(),
+      base64Data: base64Data
+    });
+  } catch (err) {
+    return createJsonResponse({
+      success: false,
+      error: "Error leyendo archivo de Google Drive: " + err.toString()
+    });
+  }
+}
+
+
+/**
+ * Recupera todas las filas de Google Sheets para consulta
+ */
+function handleGetAllData() {
+  var ss = getOrCreateSpreadsheet();
+  var sheetTelas = ss.getSheetByName(HOJA_TELAS);
+  var sheetAcc = ss.getSheetByName(HOJA_ACCESORIOS);
+
+  var telas = [];
+  if (sheetTelas && sheetTelas.getLastRow() > 1) {
+    var valsT = sheetTelas.getRange(2, 1, sheetTelas.getLastRow() - 1, sheetTelas.getLastColumn()).getValues();
+    telas = valsT;
+  }
+
+  var accesorios = [];
+  if (sheetAcc && sheetAcc.getLastRow() > 1) {
+    var valsA = sheetAcc.getRange(2, 1, sheetAcc.getLastRow() - 1, sheetAcc.getLastColumn()).getValues();
+    accesorios = valsA;
+  }
+
+  return createJsonResponse({
+    success: true,
+    telas: telas,
+    accesorios: accesorios,
+    timestamp: new Date().toISOString()
+  });
+}
+
+// =========================================================================================
+// UTILIDADES Y AYUDAS
+// =========================================================================================
+
+function getOrCreateSpreadsheet() {
+  try {
+    var active = SpreadsheetApp.getActiveSpreadsheet();
+    if (active) return active;
+  } catch (e) {}
+
+  var files = DriveApp.getFilesByName(NOMBRE_HOJA_CALCULO);
+  if (files.hasNext()) {
+    return SpreadsheetApp.open(files.next());
+  }
+
+  var ss = SpreadsheetApp.create(NOMBRE_HOJA_CALCULO);
+  var rootFolder = getOrCreateRootFolder();
+  var file = DriveApp.getFileById(ss.getId());
+  rootFolder.addFile(file);
+  DriveApp.getRootFolder().removeFile(file);
+  return ss;
+}
+
+function getOrCreateRootFolder() {
+  var folders = DriveApp.getFoldersByName(NOMBRE_CARPETA_RAIZ);
+  if (folders.hasNext()) {
+    return folders.next();
+  }
+  return DriveApp.createFolder(NOMBRE_CARPETA_RAIZ);
+}
+
+function getOrCreateSubFolder(parentFolder, subFolderName) {
+  var subs = parentFolder.getFoldersByName(subFolderName);
+  if (subs.hasNext()) {
+    return subs.next();
+  }
+  return parentFolder.createFolder(subFolderName);
+}
+
+function setupSheetHeaders(ss, sheetName, headers) {
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+  }
+
+  // Establecer encabezados
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+
+  // Estilo visual corporativo (Fondo grafito oscuro, texto dorado/blanco, negrita)
+  var headerRange = sheet.getRange(1, 1, 1, headers.length);
+  headerRange.setBackground("#111827");
+  headerRange.setFontColor("#FBBF24");
+  headerRange.setFontWeight("bold");
+  headerRange.setHorizontalAlignment("center");
+  sheet.setFrozenRows(1);
+}
+
+function createJsonResponse(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
