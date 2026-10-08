@@ -87,7 +87,17 @@ export const SqlDatabasePanel: React.FC = () => {
     handleGuardarConfig();
     setProbandoConexion(true);
     try {
-      const res = await probarConexionSql();
+      const res = await probarConexionSql({
+        engine,
+        supabaseUrl: supabaseUrl.trim(),
+        supabaseAnonKey: supabaseAnonKey.trim(),
+        host: host.trim(),
+        port: Number(port) || 5432,
+        database: database.trim(),
+        username: username.trim(),
+        password,
+        enabled
+      });
       if (res.success) {
         showToast(res.message || 'Conexión con PostgreSQL verificada exitosamente.');
       } else {

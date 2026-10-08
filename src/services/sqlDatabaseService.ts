@@ -73,24 +73,66 @@ export const guardarConfiguracionSql = (
 };
 
 /**
+ * Retorna los headers adecuados para Supabase REST API según el tipo de clave
+ */
+export const obtenerHeadersSupabase = (apiKey: string): Record<string, string> => {
+  const cleanKey = (apiKey || '').trim();
+  const headers: Record<string, string> = {
+    'apikey': cleanKey,
+    'Content-Type': 'application/json'
+  };
+  
+  if (cleanKey) {
+    headers['Authorization'] = `Bearer ${cleanKey}`;
+  }
+  return headers;
+};
+
+/**
+ * Sanitiza la URL de Supabase para evitar doble /rest/v1 o barras al final
+ */
+export const sanitizarSupabaseUrl = (url: string): string => {
+  return (url || '')
+    .trim()
+    .replace(/\/rest\/v1\/?$/i, '')
+    .replace(/\/+$/, '');
+};
+
+/**
  * Prueba la conectividad con la base de datos SQL
  */
-export const probarConexionSql = async (): Promise<SqlSyncResult> => {
-  const config = obtenerConfiguracionSql();
+export const probarConexionSql = async (
+  configOverride?: Partial<SqlIntegrationConfig>
+): Promise<SqlSyncResult> => {
+  const guardada = obtenerConfiguracionSql();
+  const config = configOverride ? { ...guardada, ...configOverride } : guardada;
   const timestamp = new Date().toISOString();
 
   // Caso 1: Supabase REST API
   if (config.engine === 'supabase' && config.supabaseUrl && config.supabaseAnonKey) {
+    const baseUrl = sanitizarSupabaseUrl(config.supabaseUrl);
+    const cleanKey = config.supabaseAnonKey.trim();
+
     try {
-      const endpoint = `${config.supabaseUrl.replace(/\/$/, '')}/rest/v1/stflab_solicitudes_telas?select=id&limit=1`;
-      const res = await fetch(endpoint, {
+      const endpoint = `${baseUrl}/rest/v1/stflab_solicitudes_telas?select=id&limit=1`;
+      
+      // Intentamos con headers estándar
+      const headers = obtenerHeadersSupabase(cleanKey);
+      let res = await fetch(endpoint, {
         method: 'GET',
-        headers: {
-          'apikey': config.supabaseAnonKey,
-          'Authorization': `Bearer ${config.supabaseAnonKey}`,
-          'Content-Type': 'application/json'
-        }
+        headers
       });
+
+      // Si falla con la clave publishable debido a 'Authorization: Bearer', reintentar solo con 'apikey'
+      if (!res.ok && res.status === 401 && cleanKey.startsWith('sb_publishable_')) {
+        res = await fetch(endpoint, {
+          method: 'GET',
+          headers: {
+            'apikey': cleanKey,
+            'Content-Type': 'application/json'
+          }
+        });
+      }
 
       if (res.ok || res.status === 200 || res.status === 206) {
         guardarConfiguracionSql({
@@ -100,7 +142,7 @@ export const probarConexionSql = async (): Promise<SqlSyncResult> => {
         });
         return {
           success: true,
-          message: 'Conexión establecida exitosamente con Supabase PostgreSQL.',
+          message: '¡Conexión verificada exitosamente con Supabase PostgreSQL!',
           timestamp
         };
       } else {
@@ -197,7 +239,9 @@ export const sincronizarSolicitudesTelasASql = async (
   try {
     // Si Supabase está configurado, podemos usar inserción upsert directa
     if (config.engine === 'supabase' && config.supabaseUrl && config.supabaseAnonKey) {
-      const endpoint = `${config.supabaseUrl.replace(/\/$/, '')}/rest/v1/stflab_solicitudes_telas`;
+      const baseUrl = sanitizarSupabaseUrl(config.supabaseUrl);
+      const cleanKey = config.supabaseAnonKey.trim();
+      const endpoint = `${baseUrl}/rest/v1/stflab_solicitudes_telas`;
       
       const rows = solicitudes.map(s => ({
         id: s.id,
@@ -216,16 +260,28 @@ export const sincronizarSolicitudesTelasASql = async (
         metadata_adicional: { esMuestraCompartida: s.esMuestraCompartida }
       }));
 
-      const res = await fetch(endpoint, {
+      const headers = {
+        ...obtenerHeadersSupabase(cleanKey),
+        'Prefer': 'resolution=merge-duplicates'
+      };
+
+      let res = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'apikey': config.supabaseAnonKey,
-          'Authorization': `Bearer ${config.supabaseAnonKey}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates'
-        },
+        headers,
         body: JSON.stringify(rows)
       });
+
+      if (!res.ok && res.status === 401 && cleanKey.startsWith('sb_publishable_')) {
+        res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'apikey': cleanKey,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(rows)
+        });
+      }
 
       if (!res.ok) {
         throw new Error(`Error Supabase (${res.status}): ${await res.text()}`);
