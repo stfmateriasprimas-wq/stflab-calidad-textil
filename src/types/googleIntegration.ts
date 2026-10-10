@@ -22,6 +22,9 @@ export interface GoogleIntegrationConfig {
   lastSyncMessage?: string;
   totalSyncedTelas?: number;
   totalSyncedAccesorios?: number;
+  totalSyncedForros?: number;
+  totalSyncedFichas?: number;
+  totalSyncedProveedores?: number;
   userAccountEmail?: string;        // Email de la cuenta Google que desplegó el script
 }
 
@@ -75,6 +78,14 @@ export interface GoogleSyncResponse {
   telasProcesadas?: number;
   accesoriosProcesados?: number;
   fichasProcesadas?: number;
+  forrosProcesados?: number;
+  proveedoresProcesados?: number;
+  pestañas?: string[];
+  telas?: any;
+  accesorios?: any;
+  forros?: any;
+  fichas?: any;
+  proveedores?: any;
   folders?: DriveSubfolder[];
   files?: DriveFolderFile[];
   totalFiles?: number;

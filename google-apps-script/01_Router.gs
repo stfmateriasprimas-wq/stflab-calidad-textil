@@ -58,10 +58,15 @@ function doPost(e) {
     if (action === 'ping') return handlePing();
     if (action === 'initStructure') return handleInitStructure();
 
-    // Rutas de Google Sheets
+    // Rutas de Google Sheets (7 Pestañas Maestras)
     if (action === 'syncTelas') return handleSyncTelas(payload.data);
     if (action === 'syncAccesorios') return handleSyncAccesorios(payload.data);
-    if (action === 'syncAll') return handleSyncAll(payload.data);
+    if (action === 'syncForrosCosturas') return handleSyncForrosCosturas(payload.data);
+    if (action === 'syncFichas') return handleSyncFichas(payload.data);
+    if (action === 'syncProveedores') return handleSyncProveedores(payload.data);
+    if (action === 'syncAuditoria') return handleSyncAuditoria(payload.data);
+    if (action === 'syncAllMaster') return handleSyncAllMaster(payload.data || payload);
+    if (action === 'syncAll') return handleSyncAll(payload.data || payload);
     if (action === 'getAllData') return handleGetAllData();
 
     // Rutas de Google Drive

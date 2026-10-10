@@ -12,7 +12,12 @@ import {
   GoogleSyncResponse, 
   GoogleDriveUploadResult 
 } from '../types/googleIntegration';
-import { SolicitudTelasCompleta, SolicitudAccesoriosCompleta } from '../types';
+import { 
+  SolicitudTelasCompleta, 
+  SolicitudAccesoriosCompleta, 
+  FichaTecnicaHistoricaVersionada, 
+  EvaluacionForrosCosturas 
+} from '../types';
 
 const STORAGE_CONFIG_KEY = 'stflab_google_workspace_config_v1';
 
@@ -33,7 +38,10 @@ const CONFIG_PREDETERMINADA: GoogleIntegrationConfig = {
   lastSyncTimestamp: new Date().toISOString(),
   lastSyncMessage: 'Conexión activa con Google Workspace STFLab y 1,644 archivos indexados',
   totalSyncedTelas: 0,
-  totalSyncedAccesorios: 0
+  totalSyncedAccesorios: 0,
+  totalSyncedForros: 0,
+  totalSyncedFichas: 0,
+  totalSyncedProveedores: 0
 };
 
 /**
@@ -294,6 +302,138 @@ export const sincronizarTodoGoogle = async (
     guardarConfiguracionGoogle({
       lastSyncStatus: 'error',
       lastSyncMessage: error?.message || 'Fallo en sincronización total'
+    });
+    return { success: false, error: error?.message };
+  }
+};
+
+/**
+ * 6. Sincronizar Evaluaciones de Forros y Costuras en Google Sheets
+ */
+export const sincronizarForrosCosturasGoogle = async (
+  evaluaciones: EvaluacionForrosCosturas[]
+): Promise<GoogleSyncResponse> => {
+  const config = obtenerConfiguracionGoogle();
+  if (!config.webAppUrl) {
+    return { success: false, error: 'Google Workspace no está configurado.' };
+  }
+
+  try {
+    const res = await invocarGoogleWebApp('syncForrosCosturas', evaluaciones);
+    if (res && res.success) {
+      guardarConfiguracionGoogle({
+        lastSyncTimestamp: new Date().toISOString(),
+        lastSyncStatus: 'success',
+        lastSyncMessage: `Sincronizados ${res.forrosProcesados || evaluaciones.length} reportes de forros y costuras en Google Sheets`,
+        totalSyncedForros: res.forrosProcesados || evaluaciones.length
+      });
+      return res;
+    }
+    return { success: false, error: res.error || 'Error al sincronizar forros y costuras' };
+  } catch (error: any) {
+    guardarConfiguracionGoogle({
+      lastSyncStatus: 'error',
+      lastSyncMessage: error?.message || 'Error al sincronizar forros y costuras'
+    });
+    return { success: false, error: error?.message };
+  }
+};
+
+/**
+ * 7. Sincronizar Fichas Técnicas del Fabricante en Google Sheets
+ */
+export const sincronizarFichasGoogle = async (
+  fichas: FichaTecnicaHistoricaVersionada[]
+): Promise<GoogleSyncResponse> => {
+  const config = obtenerConfiguracionGoogle();
+  if (!config.webAppUrl) {
+    return { success: false, error: 'Google Workspace no está configurado.' };
+  }
+
+  try {
+    const res = await invocarGoogleWebApp('syncFichas', fichas);
+    if (res && res.success) {
+      guardarConfiguracionGoogle({
+        lastSyncTimestamp: new Date().toISOString(),
+        lastSyncStatus: 'success',
+        lastSyncMessage: `Sincronizadas ${res.fichasProcesadas || fichas.length} fichas técnicas en Google Sheets`,
+        totalSyncedFichas: res.fichasProcesadas || fichas.length
+      });
+      return res;
+    }
+    return { success: false, error: res.error || 'Error al sincronizar fichas técnicas' };
+  } catch (error: any) {
+    guardarConfiguracionGoogle({
+      lastSyncStatus: 'error',
+      lastSyncMessage: error?.message || 'Error al sincronizar fichas técnicas'
+    });
+    return { success: false, error: error?.message };
+  }
+};
+
+/**
+ * 8. Sincronizar Directorio Maestro de Proveedores en Google Sheets
+ */
+export const sincronizarProveedoresGoogle = async (
+  proveedores: any[]
+): Promise<GoogleSyncResponse> => {
+  const config = obtenerConfiguracionGoogle();
+  if (!config.webAppUrl) {
+    return { success: false, error: 'Google Workspace no está configurado.' };
+  }
+
+  try {
+    const res = await invocarGoogleWebApp('syncProveedores', proveedores);
+    if (res && res.success) {
+      guardarConfiguracionGoogle({
+        lastSyncTimestamp: new Date().toISOString(),
+        lastSyncStatus: 'success',
+        lastSyncMessage: `Sincronizados ${res.proveedoresProcesados || proveedores.length} proveedores en Google Sheets`,
+        totalSyncedProveedores: res.proveedoresProcesados || proveedores.length
+      });
+      return res;
+    }
+    return { success: false, error: res.error || 'Error al sincronizar proveedores' };
+  } catch (error: any) {
+    return { success: false, error: error?.message };
+  }
+};
+
+/**
+ * 9. Sincronización Maestra Total (Telas + Accesorios + Forros/Costuras + Fichas + Proveedores)
+ */
+export const sincronizarTodoMasterGoogle = async (payload: {
+  telas?: SolicitudTelasCompleta[];
+  accesorios?: SolicitudAccesoriosCompleta[];
+  forros?: EvaluacionForrosCosturas[];
+  fichas?: FichaTecnicaHistoricaVersionada[];
+  proveedores?: any[];
+}): Promise<GoogleSyncResponse> => {
+  const config = obtenerConfiguracionGoogle();
+  if (!config.webAppUrl) {
+    return { success: false, error: 'Google Workspace no está configurado.' };
+  }
+
+  try {
+    const res = await invocarGoogleWebApp('syncAllMaster', payload);
+    if (res && res.success) {
+      guardarConfiguracionGoogle({
+        lastSyncTimestamp: new Date().toISOString(),
+        lastSyncStatus: 'success',
+        lastSyncMessage: `Sincronización maestra completada en las 7 pestañas de Google Sheets`,
+        totalSyncedTelas: payload.telas ? payload.telas.length : config.totalSyncedTelas,
+        totalSyncedAccesorios: payload.accesorios ? payload.accesorios.length : config.totalSyncedAccesorios,
+        totalSyncedForros: payload.forros ? payload.forros.length : config.totalSyncedForros,
+        totalSyncedFichas: payload.fichas ? payload.fichas.length : config.totalSyncedFichas,
+        totalSyncedProveedores: payload.proveedores ? payload.proveedores.length : config.totalSyncedProveedores
+      });
+      return res;
+    }
+    return { success: false, error: res.error || 'Error durante la sincronización maestra' };
+  } catch (error: any) {
+    guardarConfiguracionGoogle({
+      lastSyncStatus: 'error',
+      lastSyncMessage: error?.message || 'Fallo en sincronización maestra'
     });
     return { success: false, error: error?.message };
   }

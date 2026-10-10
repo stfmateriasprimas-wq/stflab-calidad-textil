@@ -15,8 +15,11 @@ var SUB_CARPETA_SOLICITUDES = "03_Solicitudes_Adjuntos";
 // Carpeta Oficial Vinculada de Google Drive para Biblioteca Técnica (Laboratorio)
 var CARPETA_BIBLIOTECA_DEFAULT_ID = "1j2VLcwxEur3GNMtP3NIh08ncDtMCqUYA";
 
-// Nombres de Hojas en Google Sheets
+// Nombres de Hojas en Google Sheets (Arquitectura de 7 Módulos Maestros)
+var HOJA_DASHBOARD = "DASHBOARD_RESUMEN";
 var HOJA_TELAS = "SOLICITUDES_TELAS";
 var HOJA_ACCESORIOS = "SOLICITUDES_ACCESORIOS";
+var HOJA_FORROS_COSTURAS = "FORROS_Y_COSTURAS";
 var HOJA_FICHAS = "FICHAS_TECNICAS";
+var HOJA_PROVEEDORES = "DIRECTORIO_PROVEEDORES";
 var HOJA_AUDITORIA = "AUDITORIA_LOGS";

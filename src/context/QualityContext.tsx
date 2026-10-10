@@ -64,7 +64,11 @@ import {
   guardarConfiguracionGoogle,
   probarConexionGoogle,
   inicializarEstructuraGoogle,
-  sincronizarTodoGoogle
+  sincronizarTodoGoogle,
+  sincronizarForrosCosturasGoogle,
+  sincronizarFichasGoogle,
+  sincronizarProveedoresGoogle,
+  sincronizarTodoMasterGoogle
 } from '../services/googleDatabaseService';
 import { GoogleIntegrationConfig, GoogleSyncResponse } from '../types/googleIntegration';
 
@@ -209,6 +213,9 @@ interface QualityContextType {
   probarConexionGoogleActiva: (url?: string) => Promise<{ success: boolean; message: string; meta?: any }>;
   inicializarEstructuraGoogleActiva: () => Promise<GoogleSyncResponse>;
   sincronizarConGoogleManual: () => Promise<GoogleSyncResponse>;
+  sincronizarFichasGoogleManual: () => Promise<GoogleSyncResponse>;
+  sincronizarForrosGoogleManual: () => Promise<GoogleSyncResponse>;
+  sincronizarTodoMasterManual: () => Promise<GoogleSyncResponse>;
   sincronizandoGoogle: boolean;
 }
 
@@ -398,6 +405,28 @@ export const QualityProvider: React.FC<{ children: ReactNode }> = ({ children })
     return MOCK_FICHAS_TECNICAS_HISTORICAS;
   });
 
+  // --- MÓDULO FORROS Y COSTURAS (PIPIN VS SHIPPING) ---
+  const [evaluacionesForrosCosturas, setEvaluacionesForrosCosturas] = useState<EvaluacionForrosCosturas[]>(() => {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_FORROS_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.warn('Error leyendo localStorage de forros y costuras:', e);
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_FORROS_KEY, JSON.stringify(evaluacionesForrosCosturas));
+    } catch (e) {
+      console.error('Error guardando forros y costuras:', e);
+    }
+  }, [evaluacionesForrosCosturas]);
+
   // 🌐 Estado de Integración con Google Workspace
   const [googleConfig, setGoogleConfig] = useState<GoogleIntegrationConfig>(() => obtenerConfiguracionGoogle());
   const [sincronizandoGoogle, setSincronizandoGoogle] = useState<boolean>(false);
@@ -410,22 +439,51 @@ export const QualityProvider: React.FC<{ children: ReactNode }> = ({ children })
     return () => window.removeEventListener('stflab-google-config-updated', handleGoogleUpdate);
   }, []);
 
-  // Sincronización automática no intrusiva hacia Google Sheets cuando cambian telas o accesorios
+  // Sincronización automática no intrusiva hacia Google Sheets en las 7 pestañas maestras
   useEffect(() => {
     if (!googleConfig.autoSyncEnabled || !googleConfig.webAppUrl) return;
-    if (solicitudesTelas.length === 0 && solicitudesAccesorios.length === 0) return;
+    if (
+      solicitudesTelas.length === 0 &&
+      solicitudesAccesorios.length === 0 &&
+      evaluacionesForrosCosturas.length === 0 &&
+      fichasTecnicasHistorial.length === 0
+    ) return;
 
     const timer = setTimeout(async () => {
       try {
-        await sincronizarTodoGoogle(solicitudesTelas, solicitudesAccesorios);
+        const provs = Array.from(new Set([
+          ...solicitudesTelas.map(s => s.proveedor),
+          ...solicitudesAccesorios.map(s => s.proveedor),
+          ...fichasTecnicasHistorial.map(f => f.proveedor)
+        ].filter(Boolean))).map((p, idx) => ({
+          id: `prov-${idx + 1}`,
+          codigoProveedor: `PRV-${(idx + 1).toString().padStart(3, '0')}`,
+          razonSocial: p,
+          tipoProveedor: 'TELA'
+        }));
+
+        await sincronizarTodoMasterGoogle({
+          telas: solicitudesTelas,
+          accesorios: solicitudesAccesorios,
+          forros: evaluacionesForrosCosturas,
+          fichas: fichasTecnicasHistorial,
+          proveedores: provs
+        });
         setGoogleConfig(obtenerConfiguracionGoogle());
       } catch (e) {
-        console.warn('Auto-sync en segundo plano con Google Sheets:', e);
+        console.warn('Auto-sync en segundo plano con Google Sheets (7 pestañas):', e);
       }
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, [solicitudesTelas, solicitudesAccesorios, googleConfig.autoSyncEnabled, googleConfig.webAppUrl]);
+  }, [
+    solicitudesTelas, 
+    solicitudesAccesorios, 
+    evaluacionesForrosCosturas, 
+    fichasTecnicasHistorial, 
+    googleConfig.autoSyncEnabled, 
+    googleConfig.webAppUrl
+  ]);
 
   const actualizarGoogleConfig = (nueva: Partial<GoogleIntegrationConfig>) => {
     const act = guardarConfiguracionGoogle(nueva);
@@ -454,6 +512,56 @@ export const QualityProvider: React.FC<{ children: ReactNode }> = ({ children })
     setSincronizandoGoogle(true);
     try {
       const res = await sincronizarTodoGoogle(solicitudesTelas, solicitudesAccesorios);
+      setGoogleConfig(obtenerConfiguracionGoogle());
+      return res;
+    } finally {
+      setSincronizandoGoogle(false);
+    }
+  };
+
+  const sincronizarFichasGoogleManual = async () => {
+    setSincronizandoGoogle(true);
+    try {
+      const res = await sincronizarFichasGoogle(fichasTecnicasHistorial);
+      setGoogleConfig(obtenerConfiguracionGoogle());
+      return res;
+    } finally {
+      setSincronizandoGoogle(false);
+    }
+  };
+
+  const sincronizarForrosGoogleManual = async () => {
+    setSincronizandoGoogle(true);
+    try {
+      const res = await sincronizarForrosCosturasGoogle(evaluacionesForrosCosturas);
+      setGoogleConfig(obtenerConfiguracionGoogle());
+      return res;
+    } finally {
+      setSincronizandoGoogle(false);
+    }
+  };
+
+  const sincronizarTodoMasterManual = async () => {
+    setSincronizandoGoogle(true);
+    try {
+      const provs = Array.from(new Set([
+        ...solicitudesTelas.map(s => s.proveedor),
+        ...solicitudesAccesorios.map(s => s.proveedor),
+        ...fichasTecnicasHistorial.map(f => f.proveedor)
+      ].filter(Boolean))).map((p, idx) => ({
+        id: `prov-${idx + 1}`,
+        codigoProveedor: `PRV-${(idx + 1).toString().padStart(3, '0')}`,
+        razonSocial: p,
+        tipoProveedor: 'TELA'
+      }));
+
+      const res = await sincronizarTodoMasterGoogle({
+        telas: solicitudesTelas,
+        accesorios: solicitudesAccesorios,
+        forros: evaluacionesForrosCosturas,
+        fichas: fichasTecnicasHistorial,
+        proveedores: provs
+      });
       setGoogleConfig(obtenerConfiguracionGoogle());
       return res;
     } finally {
@@ -1750,27 +1858,7 @@ export const QualityProvider: React.FC<{ children: ReactNode }> = ({ children })
     });
   };
 
-  // --- MÓDULO FORROS Y COSTURAS (PIPIN VS SHIPPING) ---
-  const [evaluacionesForrosCosturas, setEvaluacionesForrosCosturas] = useState<EvaluacionForrosCosturas[]>(() => {
-    try {
-      const stored = localStorage.getItem(LOCAL_STORAGE_FORROS_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch (e) {
-      console.warn('Error leyendo localStorage de forros y costuras:', e);
-    }
-    return [];
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_FORROS_KEY, JSON.stringify(evaluacionesForrosCosturas));
-    } catch (e) {
-      console.error('Error guardando forros y costuras:', e);
-    }
-  }, [evaluacionesForrosCosturas]);
+  // --- MÓDULO FORROS Y COSTURAS (PIPIN VS SHIPPING - ACCIONES) ---
 
   const agregarEvaluacionForrosCosturas = (datos: Omit<EvaluacionForrosCosturas, 'id' | 'codigoReporte' | 'createdAt' | 'updatedAt'>): EvaluacionForrosCosturas => {
     const nuevoId = `fc-${Date.now()}`;
@@ -1934,6 +2022,9 @@ export const QualityProvider: React.FC<{ children: ReactNode }> = ({ children })
         probarConexionGoogleActiva,
         inicializarEstructuraGoogleActiva,
         sincronizarConGoogleManual,
+        sincronizarFichasGoogleManual,
+        sincronizarForrosGoogleManual,
+        sincronizarTodoMasterManual,
         sincronizandoGoogle
       }}
     >

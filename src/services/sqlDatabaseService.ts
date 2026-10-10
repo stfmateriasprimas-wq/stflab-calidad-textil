@@ -16,8 +16,8 @@ const STORAGE_SQL_CONFIG_KEY = 'stflab_sql_database_config_v1';
 
 // Configuración por defecto
 const CONFIG_SQL_PREDETERMINADA: SqlIntegrationConfig = {
-  engine: 'postgresql',
-  enabled: false,
+  engine: 'supabase',
+  enabled: true,
   autoSyncWithGoogle: true,
   host: '',
   port: 5432,
@@ -25,11 +25,11 @@ const CONFIG_SQL_PREDETERMINADA: SqlIntegrationConfig = {
   username: 'postgres',
   password: '',
   ssl: true,
-  supabaseUrl: '',
+  supabaseUrl: 'https://tymnctogqximsiouptsg.supabase.co',
   supabaseAnonKey: '',
   lastSyncStatus: 'idle',
   lastSyncTimestamp: undefined,
-  lastSyncMessage: 'Módulo SQL corporativo listo para conectar.',
+  lastSyncMessage: 'Ingrese la clave de Supabase (Anon Key) y haga clic en Guardar.',
   totalSyncedTelas: 0,
   totalSyncedAccesorios: 0,
   totalSyncedFichas: 0
@@ -161,6 +161,15 @@ export const probarConexionSql = async (
         timestamp
       };
     }
+  }
+
+  // Si el motor es Supabase pero faltan las credenciales
+  if (config.engine === 'supabase') {
+    return {
+      success: false,
+      error: 'Por favor ingrese la clave API (Anon Key) de Supabase para establecer la conexión.',
+      timestamp
+    };
   }
 
   // Caso 2: A través del Google Apps Script JDBC Bridge

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Arquitectura e Integraciones Google - STFLab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090D16;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --g-blue: #4285F4;
+      --g-red: #EA4335;
+      --g-yellow: #FBBC05;
+      --g-green: #34A853;
+      --stf-cyan: #06B6D4;
+      --stf-indigo: #6366F1;
+      --stf-emerald: #10B981;
+      --stf-purple: #8B5CF6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: auto;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(66, 133, 244, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(52, 168, 83, 0.10) 0%, transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(99, 102, 241, 0.12) 0%, transparent 45%);
+    }
+
+    /* Top Bar */
+    header {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #0284C7, #0369A1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .tag-company {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+
+    .btn-svg {
+      background: rgba(255, 255, 255, 0.08);
+      color: #E2E8F0;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .btn-svg:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .btn-png {
+      background: linear-gradient(135deg, var(--g-blue), #2563EB);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);
+    }
+    .btn-png:hover {
+      background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(66, 133, 244, 0.5);
+    }
+
+    .btn-pdf {
+      background: rgba(234, 67, 53, 0.15);
+      color: #F87171;
+      border-color: rgba(234, 67, 53, 0.3);
+    }
+    .btn-pdf:hover {
+      background: rgba(234, 67, 53, 0.25);
+      transform: translateY(-1px);
+    }
+
+    /* Container */
+    main {
+      flex: 1;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .map-wrapper {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-width: 1380px;
+    }
+
+    /* Footer info */
+    .legend-bar {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1E293B;
+      color: #F8FAFC;
+      border: 1px solid #334155;
+      border-left: 4px solid var(--g-blue);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.25s ease;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media print {
+      header { display: none; }
+      body { background: #FFFFFF; color: #000; }
+      .map-wrapper { border: none; box-shadow: none; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header con Botones de Descarga -->
+  <header>
+    <div class="brand">
+      <div class="logo-badge">STF</div>
+      <div class="brand-text">
+        <h1>
+          Mapa de Arquitectura e Integraciones Google
+          <span class="tag-company">STF GROUP S.A.</span>
+        </h1>
+        <p>STFLab - Control de Calidad Textil & Homologación de Insumos</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-svg" onclick="descargarSVG()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        Descargar SVG
+      </button>
+
+      <button class="btn btn-png" onclick="descargarPNG()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        Descargar Imagen (PNG)
+      </button>
+
+      <button class="btn btn-pdf" onclick="window.print()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+        </svg>
+        Imprimir / Guardar PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenedor del Mapa SVG -->
+  <main>
+    <div class="map-wrapper">
+      <svg id="architectureMap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 920" width="1440" height="920">
+        <defs>
+          <!-- Gradientes -->
+          <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0F172A"/>
+            <stop offset="100%" stop-color="#020617"/>
+          </linearGradient>
+
+          <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1E293B" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#0F172A" stop-opacity="0.95"/>
+          </linearGradient>
+
+          <linearGradient id="gBlueGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#4285F4"/>
+            <stop offset="100%" stop-color="#2563EB"/>
+          </linearGradient>
+
+          <linearGradient id="gGreenGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#34A853"/>
+            <stop offset="100%" stop-color="#059669"/>
+          </linearGradient>
+
+          <linearGradient id="gYellowGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#FBBC05"/>
+            <stop offset="100%" stop-color="#D97706"/>
+          </linearGradient>
+
+          <linearGradient id="gRedGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#EA4335"/>
+            <stop offset="100%" stop-color="#DC2626"/>
+          </linearGradient>
+
+          <linearGradient id="stfCyanGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#06B6D4"/>
+            <stop offset="100%" stop-color="#0284C7"/>
+          </linearGradient>
+
+          <!-- Filtros de sombra y brillo -->
+          <filter id="glowBlue" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#4285F4" flood-opacity="0.3"/>
+          </filter>
+          <filter id="glowGreen" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#34A853" flood-opacity="0.3"/>
+          </filter>
+          <filter id="glowCyan" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#06B6D4" flood-opacity="0.25"/>
+          </filter>
+
+          <!-- Flecha marcadora -->
+          <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748B" />
+          </marker>
+          <marker id="arrowBlue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#38BDF8" />
+          </marker>
+          <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#34A853" />
+          </marker>
+          <marker id="arrowYellow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#FBBC05" />
+          </marker>
+        </defs>
+
+        <!-- Fondo del Lienzo -->
+        <rect width="1440" height="920" fill="url(#bgGrad)" rx="16"/>
+
+        <!-- Cuadrícula sutil -->
+        <g opacity="0.04" stroke="#FFFFFF" stroke-width="1">
+          <path d="M 0 100 H 1440 M 0 200 H 1440 M 0 300 H 1440 M 0 400 H 1440 M 0 500 H 1440 M 0 600 H 1440 M 0 700 H 1440 M 0 800 H 1440"/>
+          <path d="M 120 0 V 920 M 240 0 V 920 M 360 0 V 920 M 480 0 V 920 M 600 0 V 920 M 720 0 V 920 M 840 0 V 920 M 960 0 V 920 M 1080 0 V 920 M 1200 0 V 920 M 1320 0 V 920"/>
+        </g>
+
+        <!-- ENCABEZADO DEL MAPA -->
+        <g transform="translate(60, 45)">
+          <text x="0" y="24" fill="#FFFFFF" font-size="22" font-weight="800" letter-spacing="-0.5">MAPA GENERAL DE INTEGRACIONES GOOGLE & ARQUITECTURA HÍBRIDA</text>
+          <text x="0" y="46" fill="#94A3B8" font-size="13" font-weight="500">STFLAB 2.0 | STF GROUP S.A. (Studio F, ELA, STF MAN) | Gestión de Calidad Textil & Ensayos Técnicos</text>
+          <rect x="0" y="60" width="1320" height="1" fill="#334155" opacity="0.6"/>
+        </g>
+
+        <!-- ========================================================================= -->
+        <!-- LÍNEAS DE CONEXIÓN Y FLUJOS (CAPA INFERIOR) -->
+        <!-- ========================================================================= -->
+        <g fill="none" stroke-width="2" opacity="0.85">
+          <!-- 1. Frontend -> Google Apps Script (HTTP Tunnel) -->
+          <path d="M 370 240 C 430 240, 450 240, 500 240" stroke="#38BDF8" stroke-dasharray="6,4" marker-end="url(#arrowBlue)"/>
+          <text x="405" y="230" fill="#38BDF8" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="middle">POST JSON</text>
+
+          <!-- 2. Frontend -> Firebase Auth (Token/Login) -->
+          <path d="M 370 590 C 430 590, 440 680, 500 680" stroke="#FBBC05" marker-end="url(#arrowYellow)"/>
+          <text x="420" y="650" fill="#FBBC05" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="middle">Auth SDK</text>
+
+          <!-- 3. Frontend -> Cloud Firestore (NoSQL Sync) -->
+          <path d="M 370 610 C 650 610, 750 680, 970 680" stroke="#FBBC05" stroke-dasharray="4,4" marker-end="url(#arrowYellow)"/>
+
+          <!-- 4. Apps Script -> Google Sheets -->
+          <path d="M 830 210 C 900 210, 910 210, 970 210" stroke="#34A853" marker-end="url(#arrowGreen)"/>
+          <text x="900" y="200" fill="#34A853" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="middle">Sheets API</text>
+
+          <!-- 5. Apps Script -> Google Drive -->
+          <path d="M 830 330 C 900 330, 910 400, 970 400" stroke="#4285F4" marker-end="url(#arrowBlue)"/>
+          <text x="900" y="360" fill="#4285F4" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="middle">DriveApp Base64</text>
+
+          <!-- 6. Apps Script -> Cloud SQL / PostgreSQL (JDBC Bridge) -->
+          <path d="M 830 360 C 890 360, 910 520, 970 520" stroke="#A855F7" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+          <text x="900" y="470" fill="#C084FC" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="middle">JDBC Bridge</text>
+
+          <!-- 7. Retorno Drive -> Lectura Inteligente Frontend -->
+          <path d="M 970 430 C 670 430, 500 360, 370 360" stroke="#06B6D4" stroke-dasharray="5,5" marker-end="url(#arrowBlue)"/>
+          <text x="630" y="420" fill="#22D3EE" font-size="10" font-family="'JetBrains Mono', monospace" text-anchor="middle">◄ URLs de Visualización & Archivos Indexados</text>
+        </g>
+
+        <!-- ========================================================================= -->
+        <!-- COLUMNA 1: FRONTEND CLIENTE (STFLAB REACT)                                 -->
+        <!-- ========================================================================= -->
+        <g transform="translate(60, 140)">
+          <!-- Contenedor Sección -->
+          <rect width="310" height="710" rx="16" fill="url(#cardGrad)" stroke="#38BDF8" stroke-width="1.5" filter="url(#glowCyan)"/>
+          
+          <!-- Badge Header -->
+          <rect x="20" y="20" width="270" height="42" rx="8" fill="url(#stfCyanGrad)"/>
+          <text x="35" y="46" fill="#FFFFFF" font-size="14" font-weight="700">1. FRONTEND APP (CLIENTE)</text>
+          <text x="270" y="46" fill="#E0F2FE" font-size="11" font-weight="600" text-anchor="end">React 19 + Vite</text>
+
+          <!-- Tarjeta 1.1: Contextos y Estado -->
+          <g transform="translate(20, 80)">
+            <rect width="270" height="135" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+            <text x="16" y="26" fill="#38BDF8" font-size="12" font-weight="700">GESTIÓN DE ESTADO REACT</text>
+            
+            <circle cx="22" cy="52" r="4" fill="#38BDF8"/>
+            <text x="34" y="56" fill="#F1F5F9" font-size="11" font-weight="600">QualityContext.tsx</text>
+            <text x="34" y="70" fill="#94A3B8" font-size="10">Orquestador de Muestras y Solicitudes</text>
+
+            <circle cx="22" cy="94" r="4" fill="#38BDF8"/>
+            <text x="34" y="98" fill="#F1F5F9" font-size="11" font-weight="600">AuthContext.tsx</text>
+            <text x="34" y="112" fill="#94A3B8" font-size="10">Control de Sesión, PIN y Roles por Área</text>
+          </g>
+
+          <!-- Tarjeta 1.2: Servicios de Conexión Google -->
+          <g transform="translate(20, 230)">
+            <rect width="270" height="180" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+            <text x="16" y="26" fill="#38BDF8" font-size="12" font-weight="700">SERVICIOS DE INTEGRACIÓN</text>
+
+            <circle cx="22" cy="52" r="4" fill="#60A5FA"/>
+            <text x="34" y="56" fill="#F1F5F9" font-size="11" font-weight="600">googleDatabaseService.ts</text>
+            <text x="34" y="70" fill="#94A3B8" font-size="10">Fetch a Apps Script, subida a Drive y Pings</text>
+
+            <circle cx="22" cy="94" r="4" fill="#F59E0B"/>
+            <text x="34" y="98" fill="#F1F5F9" font-size="11" font-weight="600">firebase.ts / firestoreService.ts</text>
+            <text x="34" y="112" fill="#94A3B8" font-size="10">SDK Web v12, Auth y Firestore NoSQL</text>
+
+            <circle cx="22" cy="136" r="4" fill="#A855F7"/>
+            <text x="34" y="140" fill="#F1F5F9" font-size="11" font-weight="600">sqlDatabaseService.ts</text>
+            <text x="34" y="154" fill="#94A3B8" font-size="10">Replicación directa o vía puente JDBC</text>
+          </g>
+
+          <!-- Tarjeta 1.3: Módulos de Usuario -->
+          <g transform="translate(20, 425)">
+            <rect width="270" height="150" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+            <text x="16" y="26" fill="#38BDF8" font-size="12" font-weight="700">INTERFACES VINCULADAS</text>
+
+            <text x="16" y="54" fill="#E2E8F0" font-size="11" font-weight="600">🧪 Laboratorio:</text>
+            <text x="100" y="54" fill="#94A3B8" font-size="11">Telas, Insumos, Forros y Costuras</text>
+
+            <text x="16" y="80" fill="#E2E8F0" font-size="11" font-weight="600">🛍️ Compras:</text>
+            <text x="85" y="80" fill="#94A3B8" font-size="11">Solicitudes y Decisión Comercial</text>
+
+            <text x="16" y="106" fill="#E2E8F0" font-size="11" font-weight="600">📂 Biblioteca:</text>
+            <text x="88" y="106" fill="#94A3B8" font-size="11">Explorador Fichas en Drive</text>
+
+            <text x="16" y="132" fill="#E2E8F0" font-size="11" font-weight="600">⚙️ Panel Google:</text>
+            <text x="106" y="132" fill="#38BDF8" font-size="11">Estado, Sync y Pruebas</text>
+          </g>
+
+          <!-- Tarjeta 1.4: Auto-Sync Debounce -->
+          <g transform="translate(20, 590)">
+            <rect width="270" height="95" rx="10" fill="#0F172A" stroke="#0284C7" stroke-width="1" stroke-dasharray="3,3"/>
+            <text x="16" y="26" fill="#38BDF8" font-size="11" font-weight="700">⚡ AUTO-SINCRONIZACIÓN</text>
+            <text x="16" y="48" fill="#CBD5E1" font-size="10">Disparo reactivo en segundo plano cada vez que cambian solicitudes de Telas o Accesorios.</text>
+            <text x="16" y="76" fill="#34D399" font-size="10" font-family="'JetBrains Mono', monospace">Debounce: 3,500 ms | Auto-retry activo</text>
+          </g>
+        </g>
+
+        <!-- ========================================================================= -->
+        <!-- COLUMNA 2: MIDDLEWARE GOOGLE APPS SCRIPT & AUTH GATEWAY                    -->
+        <!-- ========================================================================= -->
+        <g transform="translate(500, 140)">
+          <!-- Contenedor Sección Apps Script -->
+          <rect width="330" height="470" rx="16" fill="url(#cardGrad)" stroke="#4285F4" stroke-width="1.5" filter="url(#glowBlue)"/>
+
+          <!-- Badge Header -->
+          <rect x="20" y="20" width="290" height="42" rx="8" fill="url(#gBlueGrad)"/>
+          <text x="35" y="46" fill="#FFFFFF" font-size="14" font-weight="700">2. GOOGLE APPS SCRIPT</text>
+          <text x="290" y="46" fill="#DBEAFE" font-size="11" font-weight="600" text-anchor="end">API Web App v1</text>
+
+          <!-- Info Despliegue -->
+          <g transform="translate(20, 80)">
+            <rect width="290" height="65" rx="8" fill="#0F172A" stroke="#1E293B" stroke-width="1"/>
+            <text x="14" y="22" fill="#94A3B8" font-size="10" font-weight="600">ENDPOINT WEB APP ACTIVO:</text>
+            <text x="14" y="40" fill="#38BDF8" font-size="9" font-family="'JetBrains Mono', monospace">script.google.com/macros/s/AKfyc...rc/exec</text>
+            <text x="14" y="55" fill="#34A853" font-size="9" font-weight="600">● Ejecutando como: Cuenta Corporativa STF</text>
+          </g>
+
+          <!-- Módulos Apps Script -->
+          <g transform="translate(20, 160)">
+            <rect width="290" height="200" rx="10" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+            <text x="16" y="24" fill="#60A5FA" font-size="12" font-weight="700">MÓDULOS DEL BACKEND (.GS)</text>
+
+            <text x="16" y="50" fill="#F1F5F9" font-size="11" font-weight="600">00_Config.gs</text>
+            <text x="16" y="64" fill="#94A3B8" font-size="10">Constantes, IDs de hojas maestras y carpetas</text>
+
+            <text x="16" y="86" fill="#F1F5F9" font-size="11" font-weight="600">01_Router.gs</text>
+            <text x="16" y="100" fill="#94A3B8" font-size="10">Enrutador doGet / doPost con acciones dinámicas</text>
+
+            <text x="16" y="122" fill="#F1F5F9" font-size="11" font-weight="600">02_SheetsService.gs</text>
+            <text x="16" y="136" fill="#94A3B8" font-size="10">Upsert, cabeceras oficiales y borrado incremental</text>
+
+            <text x="16" y="158" fill="#F1F5F9" font-size="11" font-weight="600">03_DriveService.gs</text>
+            <text x="16" y="172" fill="#94A3B8" font-size="10">Upload Base64, visor preview y escaneo por años</text>
+
+            <text x="16" y="192" fill="#F1F5F9" font-size="11" font-weight="600">04_SqlConnector.gs & 05_Utils.gs</text>
+          </g>
+
+          <!-- Badge Clasp -->
+          <g transform="translate(20, 375)">
+            <rect width="290" height="75" rx="8" fill="#0F172A" stroke="#334155" stroke-width="1"/>
+            <text x="14" y="24" fill="#CBD5E1" font-size="11" font-weight="600">Sincronización CLI con Google Clasp</text>
+            <text x="14" y="42" fill="#94A3B8" font-size="10">Control de versiones local mediante .clasp.json:</text>
+            <text x="14" y="60" fill="#E2E8F0" font-size="9" font-family="'JetBrains Mono', monospace">scriptId: 1zavxzZk4aTV1UtHs1ITRy7h...</text>
+          </g>
+
+          <!-- SECCIÓN INFERIOR: Firebase Auth Gateway -->
+          <g transform="translate(0, 490)">
+            <rect width="330" height="220" rx="16" fill="url(#cardGrad)" stroke="#FBBC05" stroke-width="1.5"/>
+            <rect x="20" y="16" width="290" height="36" rx="8" fill="url(#gYellowGrad)"/>
+            <text x="35" y="40" fill="#FFFFFF" font-size="13" font-weight="700">FIREBASE AUTHENTICATION</text>
+            <text x="290" y="40" fill="#FEF3C7" font-size="10" font-weight="600" text-anchor="end">Proyecto GCP</text>
+
+            <g transform="translate(20, 64)">
+              <text x="10" y="20" fill="#FDE68A" font-size="11" font-weight="600">Control de Identidad y Roles:</text>
+              <text x="10" y="40" fill="#E2E8F0" font-size="10">● laboratorio@stfgroup.com (Role: laboratorio)</text>
+              <text x="10" y="58" fill="#E2E8F0" font-size="10">● compras@stfgroup.com (Role: compras)</text>
+              <text x="10" y="76" fill="#E2E8F0" font-size="10">● calidad@stfgroup.com / admin (Role: calidad)</text>
+              <text x="10" y="94" fill="#E2E8F0" font-size="10">● patronaje / corte / colecciones</text>
+              <rect x="0" y="110" width="290" height="32" rx="6" fill="#0F172A"/>
+              <text x="10" y="130" fill="#34D399" font-size="10" font-family="'JetBrains Mono', monospace">Firma de PIN 4 Dígitos & Sello Digital</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- ========================================================================= -->
+        <!-- COLUMNA 3: CAPA DE DATOS Y STORAGE (SHEETS, DRIVE, CLUSTER FIRESTORE)      -->
+        <!-- ========================================================================= -->
+        <g transform="translate(970, 140)">
+          
+          <!-- TARJETA 3.1: GOOGLE SHEETS (7 PESTAÑAS MAESTRAS) -->
+          <g transform="translate(0, 0)">
+            <rect width="410" height="255" rx="16" fill="url(#cardGrad)" stroke="#34A853" stroke-width="1.5" filter="url(#glowGreen)"/>
+            <rect x="20" y="14" width="370" height="36" rx="8" fill="url(#gGreenGrad)"/>
+            <text x="35" y="38" fill="#FFFFFF" font-size="12" font-weight="700">3. GOOGLE SHEETS (7 PESTAÑAS MAESTRAS)</text>
+            <text x="375" y="38" fill="#DCFCE7" font-size="10" font-weight="600" text-anchor="end">ID: 1a92iL8...</text>
+
+            <g transform="translate(20, 58)">
+              <rect width="370" height="24" rx="4" fill="#0F172A"/>
+              <text x="10" y="16" fill="#FBBF24" font-size="10" font-weight="700">📊 DASHBOARD_RESUMEN</text>
+              <text x="360" y="16" fill="#A7F3D0" font-size="9" text-anchor="end">KPIs Vivos (COUNTA, COUNTIF, % Aprobación)</text>
+
+              <rect y="28" width="370" height="24" rx="4" fill="#1E293B"/>
+              <text x="10" y="44" fill="#34A853" font-size="10" font-weight="700">🧵 SOLICITUDES_TELAS</text>
+              <text x="360" y="44" fill="#94A3B8" font-size="9" text-anchor="end">23 Cols (OC, Dictamen Lab, Descuento, Drive)</text>
+
+              <rect y="56" width="370" height="24" rx="4" fill="#1E293B"/>
+              <text x="10" y="72" fill="#34A853" font-size="10" font-weight="700">🔩 SOLICITUDES_ACCESORIOS</text>
+              <text x="360" y="72" fill="#94A3B8" font-size="9" text-anchor="end">21 Cols (Insumos, Talla, Calificación, Drive)</text>
+
+              <rect y="84" width="370" height="24" rx="4" fill="#1E293B"/>
+              <text x="10" y="100" fill="#C084FC" font-size="10" font-weight="700">🪡 FORROS_Y_COSTURAS</text>
+              <text x="360" y="100" fill="#94A3B8" font-size="9" text-anchor="end">16 Cols (Pipin vs Shipping, Deslizamiento, Rotura)</text>
+
+              <rect y="112" width="370" height="24" rx="4" fill="#1E293B"/>
+              <text x="10" y="128" fill="#60A5FA" font-size="10" font-weight="700">📄 FICHAS_TECNICAS</text>
+              <text x="360" y="128" fill="#94A3B8" font-size="9" text-anchor="end">14 Cols (Composiciones, Peso g/m2, Ancho útil)</text>
+
+              <rect y="140" width="370" height="24" rx="4" fill="#1E293B"/>
+              <text x="10" y="156" fill="#38BDF8" font-size="10" font-weight="700">🏢 DIRECTORIO_PROVEEDORES</text>
+              <text x="360" y="156" fill="#94A3B8" font-size="9" text-anchor="end">11 Cols (Calificación histórica, Contacto)</text>
+
+              <rect y="168" width="370" height="22" rx="4" fill="#0F172A"/>
+              <text x="10" y="183" fill="#94A3B8" font-size="9" font-weight="600">🛡️ AUDITORIA_LOGS (Trazabilidad inmutable de cambios y usuarios)</text>
+            </g>
+          </g>
+
+          <!-- TARJETA 3.2: GOOGLE DRIVE (ALMACENAMIENTO DE ARCHIVOS Y BIBLIOTECA) -->
+          <g transform="translate(0, 260)">
+            <rect width="410" height="235" rx="16" fill="url(#cardGrad)" stroke="#4285F4" stroke-width="1.5" filter="url(#glowBlue)"/>
+            <rect x="20" y="16" width="370" height="38" rx="8" fill="url(#gBlueGrad)"/>
+            <text x="35" y="40" fill="#FFFFFF" font-size="13" font-weight="700">4. GOOGLE DRIVE (DOCUMENTOS & FICHAS)</text>
+            <text x="375" y="40" fill="#DBEAFE" font-size="10" font-weight="600" text-anchor="end">Carpeta Raíz: 112Ui98...</text>
+
+            <g transform="translate(20, 66)">
+              <text x="10" y="18" fill="#93C5FD" font-size="11" font-weight="600">📁 Subcarpetas Automatizadas:</text>
+              <text x="10" y="38" fill="#E2E8F0" font-size="10">● 01_Fichas_Tecnicas (PDFs y Word del fabricante)</text>
+              <text x="10" y="56" fill="#E2E8F0" font-size="10">● 02_Ensayos_Fotos (Evidencias físicas de laboratorio)</text>
+              <text x="10" y="74" fill="#E2E8F0" font-size="10">● 03_Solicitudes_Adjuntos (Packings y órdenes)</text>
+
+              <rect y="92" width="370" height="64" rx="8" fill="#0F172A" stroke="#1D4ED8" stroke-width="1"/>
+              <text x="12" y="112" fill="#60A5FA" font-size="11" font-weight="700">⭐ BIBLIOTECA TÉCNICA OFICIAL VINCULADA</text>
+              <text x="12" y="130" fill="#E2E8F0" font-size="10">ID: 1j2VLcwxEur3GNMtP3NIh08ncDtMCqUYA</text>
+              <text x="12" y="146" fill="#34D399" font-size="10" font-weight="600">1,644+ Archivos indexados y clasificados por año</text>
+            </g>
+          </g>
+
+          <!-- TARJETA 3.3: FIRESTORE & CLOUD SQL (BASE MASTER) -->
+          <g transform="translate(0, 515)">
+            <rect width="410" height="195" rx="16" fill="url(#cardGrad)" stroke="#A855F7" stroke-width="1.5"/>
+            <rect x="20" y="16" width="370" height="38" rx="8" fill="linear-gradient(135deg, #7C3AED, #9333EA)"/>
+            <text x="35" y="40" fill="#FFFFFF" font-size="13" font-weight="700">5. CLOUD FIRESTORE & CLOUD SQL</text>
+            <text x="375" y="40" fill="#F3E8FF" font-size="10" font-weight="600" text-anchor="end">Base Maestra Corporativa</text>
+
+            <g transform="translate(20, 68)">
+              <text x="10" y="18" fill="#D8B4FE" font-size="11" font-weight="700">Cloud Firestore (sharp-quanta-0t3g1):</text>
+              <text x="10" y="36" fill="#E2E8F0" font-size="10">Colecciones en tiempo real protegidas por firestore.rules</text>
+              
+              <rect y="50" width="370" height="66" rx="8" fill="#0F172A" stroke="#6B21A8" stroke-width="1"/>
+              <text x="12" y="70" fill="#C084FC" font-size="11" font-weight="700">PostgreSQL / Cloud SQL (stflab_schema_postgresql.sql):</text>
+              <text x="12" y="88" fill="#E2E8F0" font-size="10">Tablas relacionales con JSONB para ensayos físicos/químicos,</text>
+              <text x="12" y="104" fill="#E2E8F0" font-size="10">UUIDs, ENUMs y triggers de trazabilidad automática.</text>
+            </g>
+          </g>
+
+        </g>
+
+        <!-- PIE DE PÁGINA DEL MAPA -->
+        <g transform="translate(60, 875)">
+          <rect width="1320" height="30" rx="6" fill="#0F172A"/>
+          <text x="16" y="20" fill="#64748B" font-size="11">🔒 Arquitectura de Seguridad: Acceso autenticado mediante tokens corporativos Google Workspace & Firebase Rules. Auditoría inmutable.</text>
+          <text x="1304" y="20" fill="#38BDF8" font-size="11" font-weight="600" text-anchor="end">STF GROUP S.A. © 2026</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend-bar">
+      <div class="legend-item"><div class="dot" style="background:#38BDF8"></div> Frontend React & Client Services</div>
+      <div class="legend-item"><div class="dot" style="background:#4285F4"></div> Google Apps Script Gateway</div>
+      <div class="legend-item"><div class="dot" style="background:#34A853"></div> Google Sheets (Persistencia Tabular)</div>
+      <div class="legend-item"><div class="dot" style="background:#0284C7"></div> Google Drive (Archivos & Fichas)</div>
+      <div class="legend-item"><div class="dot" style="background:#FBBC05"></div> Firebase Auth & GCP</div>
+      <div class="legend-item"><div class="dot" style="background:#A855F7"></div> Cloud SQL / PostgreSQL Maestro</div>
+    </div>
+  </main>
+
+  <!-- Notificación Toast -->
+  <div id="toast"></div>
+
+  <script>
+    function notificar(mensaje) {
+      const toast = document.getElementById('toast');
+      toast.innerText = mensaje;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // 1. Descargar como archivo SVG Vectorial
+    function descargarSVG() {
+      try {
+        const svgElement = document.getElementById('architectureMap');
+        const serializer = new XMLSerializer();
+        let source = serializer.serializeToString(svgElement);
+
+        if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+          source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+
+        const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mapa_integraciones_google_stflab.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        notificar('✅ Mapa vectorial descargado exitosamente como SVG');
+      } catch (err) {
+        console.error(err);
+        notificar('❌ Error al exportar SVG: ' + err.message);
+      }
+    }
+
+    // 2. Descargar como imagen PNG de Alta Resolución (2880x1840 Retina)
+    function descargarPNG() {
+      try {
+        const svgElement = document.getElementById('architectureMap');
+        const serializer = new XMLSerializer();
+        let source = serializer.serializeToString(svgElement);
+
+        const img = new Image();
+        const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          // Resolución x2 para calidad Retina nítida
+          canvas.width = 2880;
+          canvas.height = 1840;
+          const ctx = canvas.getContext('2d');
+          
+          ctx.fillStyle = '#090D16';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          URL.revokeObjectURL(url);
+
+          canvas.toBlob((pngBlob) => {
+            if (!pngBlob) {
+              notificar('❌ Error generando PNG');
+              return;
+            }
+            const pngUrl = URL.createObjectURL(pngBlob);
+            const a = document.createElement('a');
+            a.href = pngUrl;
+            a.download = 'mapa_integraciones_google_stflab_hd.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(pngUrl);
+
+            notificar('✅ Mapa descargado exitosamente como imagen PNG (2880x1840)');
+          }, 'image/png');
+        };
+
+        img.src = url;
+      } catch (err) {
+        console.error(err);
+        notificar('❌ Error al exportar PNG: ' + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

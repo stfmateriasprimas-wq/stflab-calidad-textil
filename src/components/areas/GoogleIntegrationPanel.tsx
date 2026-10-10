@@ -665,9 +665,12 @@ export const GoogleIntegrationPanel: React.FC = () => {
     probarConexionGoogleActiva,
     inicializarEstructuraGoogleActiva,
     sincronizarConGoogleManual,
+    sincronizarTodoMasterManual,
     sincronizandoGoogle,
     solicitudesTelas,
-    solicitudesAccesorios
+    solicitudesAccesorios,
+    evaluacionesForrosCosturas,
+    fichasTecnicasHistorial
   } = useQuality();
 
   const [inputUrl, setInputUrl] = useState(googleConfig.webAppUrl || '');
@@ -719,11 +722,11 @@ export const GoogleIntegrationPanel: React.FC = () => {
       return;
     }
 
-    setMensajeEstado({ tipo: 'info', texto: 'Creando carpetas en Google Drive y hojas de cálculo...' });
+    setMensajeEstado({ tipo: 'info', texto: 'Configurando las 7 pestañas maestras en Google Sheets y carpetas en Drive...' });
     const res = await inicializarEstructuraGoogleActiva();
 
     if (res.success) {
-      setMensajeEstado({ tipo: 'exito', texto: res.message || 'Estructura en Sheets y Drive configurada con éxito.' });
+      setMensajeEstado({ tipo: 'exito', texto: res.message || 'Estructura de 7 pestañas configurada con éxito.' });
     } else {
       setMensajeEstado({ tipo: 'error', texto: res.error || 'Error al inicializar estructura.' });
     }
@@ -735,13 +738,13 @@ export const GoogleIntegrationPanel: React.FC = () => {
       return;
     }
 
-    setMensajeEstado({ tipo: 'info', texto: 'Sincronizando todas las solicitudes con Google Sheets...' });
-    const res = await sincronizarConGoogleManual();
+    setMensajeEstado({ tipo: 'info', texto: 'Sincronizando todas las entidades con las 7 pestañas de Google Sheets...' });
+    const res = await sincronizarTodoMasterManual();
 
     if (res.success) {
       setMensajeEstado({
         tipo: 'exito',
-        texto: `✓ Sincronización exitosa: ${solicitudesTelas.length} telas y ${solicitudesAccesorios.length} insumos respaldados.`
+        texto: `✓ Sincronización maestra exitosa: ${solicitudesTelas.length} telas, ${solicitudesAccesorios.length} insumos, ${evaluacionesForrosCosturas.length} forros y ${fichasTecnicasHistorial.length} fichas respaldadas en Google Sheets.`
       });
     } else {
       setMensajeEstado({ tipo: 'error', texto: res.error || 'Fallo en la sincronización.' });
@@ -878,11 +881,19 @@ export const GoogleIntegrationPanel: React.FC = () => {
               </a>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-[#424246] flex items-center justify-between text-[11px]">
-              <span className="text-[#AA9E80]">Pestañas sincronizadas:</span>
-              <div className="flex gap-2">
-                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-emerald-300 font-mono text-[10px]">Telas ({solicitudesTelas.length})</span>
-                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-emerald-300 font-mono text-[10px]">Insumos ({solicitudesAccesorios.length})</span>
+            <div className="mt-4 pt-3 border-t border-[#424246] flex flex-col gap-2 text-[11px]">
+              <div className="flex items-center justify-between">
+                <span className="text-[#AA9E80]">7 Pestañas Maestras Integradas:</span>
+                <span className="text-emerald-400 font-bold text-[10px]">Dashboard Live</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-amber-300 font-mono text-[10px]">📊 Dashboard</span>
+                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-emerald-300 font-mono text-[10px]">🧵 Telas ({solicitudesTelas.length})</span>
+                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-emerald-300 font-mono text-[10px]">🔩 Insumos ({solicitudesAccesorios.length})</span>
+                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-purple-300 font-mono text-[10px]">🪡 Forros & Costuras ({evaluacionesForrosCosturas.length})</span>
+                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-blue-300 font-mono text-[10px]">📄 Fichas ({fichasTecnicasHistorial.length})</span>
+                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-cyan-300 font-mono text-[10px]">🏢 Proveedores</span>
+                <span className="px-2 py-0.5 rounded-md bg-[#1F1F22] text-gray-300 font-mono text-[10px]">🛡️ Auditoría</span>
               </div>
             </div>
           </div>

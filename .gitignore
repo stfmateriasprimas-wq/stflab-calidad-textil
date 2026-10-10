@@ -27,3 +27,5 @@ test_*.ts
 !.env.example
 .clasp.json
 .clasprc.json
+.vercel
+*.traineddata

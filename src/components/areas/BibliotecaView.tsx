@@ -189,16 +189,13 @@ export const BibliotecaView: React.FC = () => {
               <BookOpen className="h-5.5 w-5.5 text-[#C6A466] mr-2" />
               Biblioteca Técnica de Fichas del Fabricante
             </h2>
-            <span className="text-xs bg-[#C6A466]/20 text-[#C6A466] font-bold px-2.5 py-0.5 rounded-full border border-[#C6A466]/30">
-              FORMATO OFICIAL STF GROUP
-            </span>
           </div>
           <p className="text-[#AA9E80] text-xs">
             Especificaciones técnicas de tela (tejido plano / punto) con parámetros oficiales del fabricante sin datos inventados.
           </p>
         </div>
 
-        {/* Buscador y Botones de Acción */}
+        {/* Buscador */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AA9E80]" />
@@ -207,53 +204,9 @@ export const BibliotecaView: React.FC = () => {
               placeholder="Buscar referencia o proveedor..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-[#2B2B2E] border border-[#424246] rounded-xl text-xs text-[#FBF8F2] placeholder-[#AA9E80]/50 focus:outline-none focus:border-[#C6A466] w-full sm:w-52"
+              className="pl-9 pr-4 py-2 bg-[#2B2B2E] border border-[#424246] rounded-xl text-xs text-[#FBF8F2] placeholder-[#AA9E80]/50 focus:outline-none focus:border-[#C6A466] w-full sm:w-64"
             />
           </div>
-
-          {/* Botón Principal: Lectura Inteligente vinculada a Google Drive */}
-          <button
-            type="button"
-            onClick={() => setIsModalLecturaDriveOpen(true)}
-            className="bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-black px-4 py-2 rounded-xl font-black text-xs flex items-center space-x-2 shadow-lg shadow-amber-500/20 active:scale-95 transition-all cursor-pointer border border-amber-300 shrink-0"
-            title="Subir y procesar documentos textiles con Lectura Inteligente vinculados a Google Drive"
-          >
-            <Sparkles className="h-4 w-4 text-black animate-pulse" />
-            <span>Lectura Inteligente (Drive)</span>
-          </button>
-
-          {/* Enlace Oficial a la Carpeta de Google Drive */}
-          <a
-            href={CARPETA_OFICIAL_DRIVE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/40 text-blue-300 px-3.5 py-2 rounded-xl font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all shrink-0"
-            title="Abrir la Carpeta Oficial de Fichas Técnicas en Google Drive (1j2VLcwxEur3GNMtP3NIh08ncDtMCqUYA)"
-          >
-            <HardDrive className="h-4 w-4 text-blue-400" />
-            <span>Carpeta Drive</span>
-            <ExternalLink className="h-3 w-3 opacity-70" />
-          </a>
-
-          <button
-            type="button"
-            onClick={() => setIsModalExploradorOpen(true)}
-            className="bg-[#485C3E] hover:bg-[#5A734E] text-white px-3.5 py-2 rounded-xl font-extrabold text-xs flex items-center space-x-2 shadow-md transition-all cursor-pointer border border-[#94A786]/60 shrink-0"
-            title="Abrir Explorador Base Histórica de Fichas Técnicas"
-          >
-            <BookOpen className="h-4 w-4 text-white" />
-            <span className="text-white">Explorador Base FT</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleLimpiarBaseDatos}
-            className="bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-700/50 px-3 py-2 rounded-xl font-bold text-xs flex items-center space-x-1.5 shadow-sm transition-all cursor-pointer shrink-0"
-            title="Limpiar base de datos y purgar datos no oficiales"
-          >
-            <Trash2 className="h-4 w-4 text-rose-400" />
-            <span>Limpiar BD</span>
-          </button>
         </div>
       </div>
 
@@ -277,14 +230,7 @@ export const BibliotecaView: React.FC = () => {
             <span className="text-[10px] opacity-75 font-mono">({f.codigoFT})</span>
           </button>
         ))}
-        <button
-          type="button"
-          onClick={() => setIsModalLecturaDriveOpen(true)}
-          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>+ Cargar Ficha desde Drive</span>
-        </button>
+
       </div>
 
       {currentFicha && currentVersion && docData ? (
@@ -324,18 +270,7 @@ export const BibliotecaView: React.FC = () => {
                   <span>Ver Formato Completo</span>
                 </button>
 
-                {/* Acceso directo a Google Drive para el documento actual */}
-                <a
-                  href={currentFicha.enlaceDrive || CARPETA_OFICIAL_DRIVE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-blue-950/50 hover:bg-blue-900/70 border border-blue-500/40 text-blue-300 font-bold text-xs px-3 py-1.5 rounded-xl flex items-center space-x-1.5 shadow-sm transition-all"
-                  title="Abrir el documento original en Google Drive"
-                >
-                  <HardDrive className="h-3.5 w-3.5 text-blue-400" />
-                  <span>Ver en Google Drive</span>
-                  <ExternalLink className="h-3 w-3" />
-                </a>
+
               </div>
 
               <p className="text-xs text-[#AA9E80] mt-1">
