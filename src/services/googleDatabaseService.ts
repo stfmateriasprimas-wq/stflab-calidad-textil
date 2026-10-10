@@ -23,7 +23,7 @@ const STORAGE_CONFIG_KEY = 'stflab_google_workspace_config_v1';
 
 // Configuración por defecto
 const CONFIG_PREDETERMINADA: GoogleIntegrationConfig = {
-  webAppUrl: ((import.meta as any).env?.VITE_GOOGLE_WEBAPP_URL as string) || 'https://script.google.com/macros/s/AKfycby5XPSFylI_arwbdNdXgm7uEC20aPhtn2yU0vZcVrSeZTB0JlIveOoSzEdIx-1q7_rc/exec',
+  webAppUrl: ((import.meta as any).env?.VITE_GOOGLE_WEBAPP_URL as string) || 'https://script.google.com/macros/s/AKfycbyaEhfGAT-j6IogGJueycXdo7X_u-Qz1pueVxgKLi6gS9WAtTalVVoBHW83oDy9Q7Fi/exec',
   autoSyncEnabled: true,
   spreadsheetId: '1a92iL8dVh5MwGJK0idIpdspcGKHGNfbGn6VmVaK20d0',
   spreadsheetUrl: 'https://docs.google.com/spreadsheets/d/1a92iL8dVh5MwGJK0idIpdspcGKHGNfbGn6VmVaK20d0/edit',
