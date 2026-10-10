@@ -566,6 +566,14 @@ export const ESTRUCTURA_OFICIAL_DRIVE_LABORATORIO = {
       url: 'https://drive.google.com/file/d/1DKAN0FdmYMYQvpP4TY-BFk0CaEOhW0qU/view',
       folderName: 'LABORATORIO',
       year: 'Referencias'
+    },
+    {
+      id: '1j2VLcwxEur3GNMtP3NIh08ncDtMCqUYA-sheet',
+      name: 'STFLAB - Base de Datos Calidad Textil',
+      mimeType: 'application/vnd.google-apps.spreadsheet',
+      url: 'https://drive.google.com/drive/folders/1j2VLcwxEur3GNMtP3NIh08ncDtMCqUYA',
+      folderName: 'LABORATORIO',
+      year: 'Base Oficial'
     }
   ]
 };
