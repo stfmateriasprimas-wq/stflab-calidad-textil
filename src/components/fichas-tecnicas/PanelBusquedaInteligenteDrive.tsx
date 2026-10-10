@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { FichaTecnicaHistoricaVersionada } from '../../types';
-import { listarArchivosCarpetaDrive, ESTRUCTURA_OFICIAL_DRIVE_LABORATORIO } from '../../services/googleDatabaseService';
+import { listarArchivosCarpetaDrive } from '../../services/googleDatabaseService';
 import { CARPETA_OFICIAL_DRIVE_URL, CARPETA_OFICIAL_DRIVE_ID } from '../../utils/textileSmartParser';
 import { 
   Calendar, 
@@ -18,14 +18,10 @@ import {
   ChevronDown, 
   ChevronUp, 
   Layers, 
-  Folder, 
   Tag, 
   X, 
   RefreshCw, 
-  ArrowRight, 
-  Eye, 
-  BookOpen,
-  Info
+  Eye
 } from 'lucide-react';
 
 export type FormatoDocumentoType = 'TODOS' | 'PDF' | 'EXCEL' | 'WORD' | 'IMAGEN';
@@ -523,59 +519,59 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
     switch (formato) {
       case 'PDF':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/30">
-            <FileText className="w-3 h-3 text-rose-400" /> PDF
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-500/40">
+            <FileText className="w-3 h-3 text-rose-600 dark:text-rose-400" /> PDF
           </span>
         );
       case 'EXCEL':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-            <FileSpreadsheet className="w-3 h-3 text-emerald-400" /> EXCEL
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-500/40">
+            <FileSpreadsheet className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> EXCEL
           </span>
         );
       case 'WORD':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/30">
-            <File className="w-3 h-3 text-blue-400" /> WORD
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-500/40">
+            <File className="w-3 h-3 text-blue-600 dark:text-blue-400" /> WORD
           </span>
         );
       case 'IMAGEN':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/30">
-            <ImageIcon className="w-3 h-3 text-purple-400" /> IMAGEN
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-500/40">
+            <ImageIcon className="w-3 h-3 text-purple-600 dark:text-purple-400" /> IMAGEN
           </span>
         );
     }
   };
 
   return (
-    <div className="bg-[#262629] border border-[#424246] rounded-3xl p-5 md:p-6 shadow-xl space-y-5 text-[#FBF8F2] transition-all">
+    <div className="bg-white dark:bg-[#0f1b35] border border-slate-200 dark:border-[#1e3461] rounded-3xl p-5 md:p-6 shadow-sm space-y-5 text-slate-800 dark:text-slate-100 transition-all">
       
       {/* Toast interno de feedback */}
       {mensajeToast && (
-        <div className="fixed top-5 right-5 bg-[#2B2B2E] text-amber-300 text-xs px-4 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 border border-amber-400/40 z-50 animate-bounce">
+        <div className="fixed top-5 right-5 bg-slate-900 text-amber-300 text-xs px-4 py-2.5 rounded-2xl shadow-2xl flex items-center space-x-2 border border-amber-400/50 z-50 animate-bounce">
           <CheckCircle2 className="h-4 w-4 text-amber-400" />
           <span className="font-bold">{mensajeToast}</span>
         </div>
       )}
 
       {/* Cabecera Principal del Panel Inteligente y Estado de Google Drive */}
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-[#424246] pb-4">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-slate-200 dark:border-[#1e3461] pb-4">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 text-black flex items-center justify-center font-black shadow-md">
-              <Calendar className="w-4 h-4 text-zinc-950" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center font-black shadow-md">
+              <Calendar className="w-4.5 h-4.5 text-slate-950" />
             </div>
-            <h3 className="text-base sm:text-lg font-serif font-black text-[#FBF8F2] uppercase tracking-wide flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-serif font-black text-slate-900 dark:text-white uppercase tracking-wide flex items-center gap-2">
               Búsqueda Inteligente & Calendario de Fichas
             </h3>
-            <span className="text-[10px] bg-blue-500/15 text-blue-300 border border-blue-400/30 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="text-[11px] bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Google Drive Vinculado
             </span>
           </div>
-          <p className="text-[#AA9E80] text-xs">
-            Filtra en tiempo real por <strong className="text-amber-300">Año y Mes</strong>, busca por <strong className="text-white">Nombre de Tela o Tela en Ficha</strong>, y selecciona por <strong className="text-cyan-300">Formato</strong> con sincronización directa al Drive de Laboratorio.
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">
+            Filtra en tiempo real por <strong className="text-amber-700 dark:text-amber-300 font-bold">Año y Mes</strong>, busca por <strong className="text-slate-900 dark:text-white font-bold">Nombre de Tela o Tela en Ficha</strong>, y selecciona por <strong className="text-sky-700 dark:text-cyan-300 font-bold">Formato de Documento</strong> con sincronización automática a Google Drive.
           </p>
         </div>
 
@@ -585,10 +581,10 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
             type="button"
             onClick={sincronizarConGoogleDrive}
             disabled={cargandoDrive}
-            className="bg-[#2D2D30] hover:bg-[#38383C] text-cyan-300 border border-cyan-500/40 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-cyan-300 border border-slate-300 dark:border-cyan-500/40 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 transition-all cursor-pointer shadow-xs disabled:opacity-50"
             title="Sincronizar archivos y subcarpetas con la carpeta de Google Drive"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${cargandoDrive ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-sky-600 dark:text-cyan-400 ${cargandoDrive ? 'animate-spin' : ''}`} />
             <span>{cargandoDrive ? 'Sincronizando...' : 'Sincronizar Drive'}</span>
           </button>
 
@@ -596,18 +592,18 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
             href={CARPETA_OFICIAL_DRIVE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-blue-950/40 hover:bg-blue-900/60 text-blue-300 border border-blue-500/40 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all"
+            className="bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:hover:bg-blue-900/80 dark:text-blue-300 border border-blue-200 dark:border-blue-500/40 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all shadow-xs"
             title="Abrir la Carpeta Oficial en Google Drive"
           >
-            <HardDrive className="w-3.5 h-3.5 text-blue-400" />
+            <HardDrive className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             <span className="hidden sm:inline">Drive LABORATORIO</span>
-            <ExternalLink className="w-3 h-3 opacity-70" />
+            <ExternalLink className="w-3 h-3 opacity-75" />
           </a>
 
           <button
             type="button"
             onClick={() => setPanelColapsado(!panelColapsado)}
-            className="p-1.5 rounded-xl bg-[#2D2D30] text-[#AA9E80] hover:text-[#FBF8F2] border border-[#424246] transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-700 transition-all cursor-pointer shadow-xs"
             title={panelColapsado ? 'Expandir filtros' : 'Minimizar filtros'}
           >
             {panelColapsado ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
@@ -617,23 +613,23 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
 
       {/* CUERPO DE LOS 3 APARTADOS INTELIGENTES (Colapsable) */}
       {!panelColapsado && (
-        <div className="space-y-5">
+        <div className="space-y-4">
           
           {/* APARTADO 1: CALENDARIO EN AÑO Y MES */}
-          <div className="bg-[#2B2B2E] p-4 rounded-2xl border border-[#424246] space-y-3">
+          <div className="bg-white dark:bg-[#132247] p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-[#1e3461] space-y-3.5 shadow-xs">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-black uppercase text-[#C6A466] tracking-wider flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-[#C6A466]" />
+              <span className="text-xs font-black uppercase text-amber-900 dark:text-amber-300 tracking-wider flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 1. Calendario de Fichas (Año y Mes)
               </span>
 
               {/* Indicador del período activo */}
-              <div className="text-[11px] font-bold text-zinc-300 bg-[#242426] px-3 py-1 rounded-xl border border-[#424246] flex items-center gap-1.5">
-                <span className="text-[#AA9E80]">Período:</span>
-                <span className="text-amber-300 font-mono">
+              <div className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-[#0f1b35] px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-[#1e3461] flex items-center gap-1.5 shadow-xs">
+                <span className="text-slate-500 dark:text-slate-400 font-semibold">Período Seleccionado:</span>
+                <span className="text-amber-800 dark:text-amber-300 font-black">
                   {filtroMes === 0 ? 'Todos los Meses' : NOMBRES_MESES_COMPLETOS[filtroMes]}
                 </span>
-                <span className="text-cyan-300 font-mono">
+                <span className="text-sky-800 dark:text-cyan-300 font-black">
                   ({filtroAnio === 'TODOS' ? 'Todos los Años' : filtroAnio})
                 </span>
               </div>
@@ -641,15 +637,17 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
 
             {/* Selector de Años */}
             <div className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase text-[#AA9E80] block">Seleccionar Año:</span>
-              <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-black uppercase text-slate-700 dark:text-slate-300 block tracking-wide">
+                Seleccionar Año:
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setFiltroAnio('TODOS')}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs ${
                     filtroAnio === 'TODOS'
-                      ? 'bg-[#C6A466] text-[#2B2B2E] shadow-md ring-2 ring-amber-400/50'
-                      : 'bg-[#242426] text-[#AA9E80] hover:text-white border border-[#424246]'
+                      ? 'bg-amber-500 text-slate-950 shadow-md font-black ring-2 ring-amber-400'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 dark:bg-[#0f1b35] dark:hover:bg-[#1e3461] dark:text-slate-200 dark:border-slate-700 font-bold'
                   }`}
                 >
                   Todos los Años
@@ -659,10 +657,10 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
                     key={anio}
                     type="button"
                     onClick={() => setFiltroAnio(String(anio))}
-                    className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer shadow-xs ${
                       filtroAnio === String(anio)
-                        ? 'bg-[#C6A466] text-[#2B2B2E] shadow-md ring-2 ring-amber-400/50'
-                        : 'bg-[#242426] text-[#AA9E80] hover:text-white border border-[#424246]'
+                        ? 'bg-amber-500 text-slate-950 shadow-md font-black ring-2 ring-amber-400'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 dark:bg-[#0f1b35] dark:hover:bg-[#1e3461] dark:text-slate-200 dark:border-slate-700 font-bold'
                     }`}
                   >
                     {anio}
@@ -673,15 +671,17 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
 
             {/* Selector de Meses (1 a 12) */}
             <div className="space-y-1.5">
-              <span className="text-[10px] font-bold uppercase text-[#AA9E80] block">Seleccionar Mes del Año:</span>
-              <div className="grid grid-cols-4 sm:grid-cols-7 lg:grid-cols-13 gap-1">
+              <span className="text-[11px] font-black uppercase text-slate-700 dark:text-slate-300 block tracking-wide">
+                Seleccionar Mes del Año:
+              </span>
+              <div className="grid grid-cols-4 sm:grid-cols-7 lg:grid-cols-13 gap-1.5">
                 <button
                   type="button"
                   onClick={() => setFiltroMes(0)}
-                  className={`py-1.5 px-2 rounded-xl text-xs font-bold text-center transition-all cursor-pointer ${
+                  className={`py-2 px-2 rounded-xl text-xs font-bold text-center transition-all cursor-pointer shadow-xs ${
                     filtroMes === 0
-                      ? 'bg-amber-400 text-zinc-950 shadow-md font-black'
-                      : 'bg-[#242426] text-[#AA9E80] hover:text-white border border-[#424246]'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-md ring-2 ring-amber-400'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 dark:bg-[#0f1b35] dark:hover:bg-[#1e3461] dark:text-slate-200 dark:border-slate-700 font-bold'
                   }`}
                 >
                   Todos
@@ -695,18 +695,18 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
                       key={numMes}
                       type="button"
                       onClick={() => setFiltroMes(numMes)}
-                      className={`py-1.5 px-1.5 rounded-xl text-xs text-center transition-all cursor-pointer relative flex flex-col items-center justify-center ${
+                      className={`py-2 px-1.5 rounded-xl text-xs text-center transition-all cursor-pointer relative flex flex-col items-center justify-center shadow-xs ${
                         seleccionado
-                          ? 'bg-amber-400 text-zinc-950 font-black shadow-md ring-2 ring-amber-300'
+                          ? 'bg-amber-500 text-slate-950 font-black shadow-md ring-2 ring-amber-400'
                           : cantidadEnMes > 0
-                            ? 'bg-[#2D2D30] text-zinc-200 hover:bg-[#38383C] border border-[#424246]'
-                            : 'bg-[#242426]/60 text-[#AA9E80]/60 hover:text-zinc-300 border border-[#424246]/40'
+                            ? 'bg-sky-50 text-sky-900 border border-sky-300 hover:bg-sky-100 font-black dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-700/50'
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 border border-slate-200 dark:bg-[#0f1b35]/60 dark:text-slate-400 dark:border-slate-800 font-bold'
                       }`}
                       title={`${NOMBRES_MESES_COMPLETOS[numMes]}: ${cantidadEnMes} documentos`}
                     >
-                      <span className="font-bold text-[11px]">{NOMBRES_MESES_CORTOS[numMes]}</span>
+                      <span className="font-bold text-[11px] leading-tight">{NOMBRES_MESES_CORTOS[numMes]}</span>
                       {cantidadEnMes > 0 && (
-                        <span className={`text-[9px] font-mono leading-none ${seleccionado ? 'text-zinc-900 font-black' : 'text-amber-400'}`}>
+                        <span className={`text-[10px] font-mono leading-none mt-0.5 ${seleccionado ? 'text-slate-950 font-black' : 'text-sky-800 dark:text-cyan-300 font-black'}`}>
                           ({cantidadEnMes})
                         </span>
                       )}
@@ -721,122 +721,122 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
             {/* APARTADO 2: BÚSQUEDA INTELIGENTE POR NOMBRE */}
-            <div className="lg:col-span-7 bg-[#2B2B2E] p-4 rounded-2xl border border-[#424246] space-y-2.5">
+            <div className="lg:col-span-7 bg-white dark:bg-[#132247] p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-[#1e3461] space-y-3 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase text-[#C6A466] tracking-wider flex items-center gap-1.5">
-                  <Search className="w-3.5 h-3.5 text-[#C6A466]" />
+                <span className="text-xs font-black uppercase text-amber-900 dark:text-amber-300 tracking-wider flex items-center gap-1.5">
+                  <Search className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   2. Búsqueda por Nombre de Tela o Ficha
                 </span>
-                <span className="text-[10px] text-[#AA9E80]">
-                  Filtra en el período seleccionado
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-bold">
+                  Filtro reactivo por fecha
                 </span>
               </div>
 
               <div className="relative">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AA9E80]" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-slate-500 dark:text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Ej: CREPE VICTORIA, DESIGN 6341 A, POPELINA, MEX38770, TEXTIVISION..."
+                  placeholder="Buscar tela (ej: CREPE VICTORIA), tela en ficha (DESIGN 6341 A), código FT, PO..."
                   value={busquedaNombre}
                   onChange={(e) => setBusquedaNombre(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2.5 bg-[#242426] border border-[#424246] rounded-xl text-xs text-[#FBF8F2] placeholder-[#AA9E80]/50 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition-all font-medium"
+                  className="w-full pl-10 pr-9 py-2.5 bg-slate-50 dark:bg-[#0f1b35] border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-950 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all font-bold shadow-xs"
                 />
                 {busquedaNombre && (
                   <button
                     type="button"
                     onClick={() => setBusquedaNombre('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#AA9E80] hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-950 dark:hover:text-white cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
-              <p className="text-[11px] text-[#AA9E80] leading-snug">
-                Busca simultáneamente por el <strong className="text-zinc-200">nombre comercial de la tela</strong>, la <strong className="text-zinc-200">referencia técnica en la ficha</strong>, código FT o proveedor oficial.
+              <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                Busca simultáneamente por el <strong className="text-slate-950 dark:text-white font-black">nombre comercial de la tela</strong>, la <strong className="text-slate-950 dark:text-white font-black">referencia oficial de la ficha técnica</strong>, código FT o proveedor.
               </p>
             </div>
 
             {/* APARTADO 3: FORMATO DE DOCUMENTO */}
-            <div className="lg:col-span-5 bg-[#2B2B2E] p-4 rounded-2xl border border-[#424246] space-y-2.5">
+            <div className="lg:col-span-5 bg-white dark:bg-[#132247] p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-[#1e3461] space-y-3 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase text-[#C6A466] tracking-wider flex items-center gap-1.5">
-                  <Filter className="w-3.5 h-3.5 text-[#C6A466]" />
+                <span className="text-xs font-black uppercase text-amber-900 dark:text-amber-300 tracking-wider flex items-center gap-1.5">
+                  <Filter className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   3. Formato de Documento
                 </span>
-                <span className="text-[10px] text-[#AA9E80]">
-                  Tipo de archivo
+                <span className="text-[11px] text-slate-600 dark:text-slate-400 font-bold">
+                  Extensión de archivo
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setFiltroFormato('TODOS')}
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs ${
                     filtroFormato === 'TODOS'
-                      ? 'bg-zinc-100 text-zinc-950 shadow-md font-black'
-                      : 'bg-[#242426] text-[#AA9E80] hover:text-white border border-[#424246]'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-md font-black ring-2 ring-slate-800/20'
+                      : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-300 dark:bg-[#0f1b35] dark:hover:bg-[#1e3461] dark:text-slate-200 dark:border-slate-700 font-bold'
                   }`}
                 >
                   <span>Todos</span>
-                  <span className="text-[10px] opacity-75 font-mono">({conteoPorFormato.TODOS})</span>
+                  <span className="text-[10px] opacity-80 font-mono">({conteoPorFormato.TODOS})</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setFiltroFormato('PDF')}
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs ${
                     filtroFormato === 'PDF'
-                      ? 'bg-rose-500 text-white shadow-md font-black ring-2 ring-rose-400/50'
-                      : 'bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 border border-rose-500/30'
+                      ? 'bg-rose-600 text-white shadow-md font-black ring-2 ring-rose-400'
+                      : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-500/40 font-bold'
                   }`}
                 >
-                  <FileText className="w-3 h-3 text-rose-400" />
+                  <FileText className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
                   <span>PDF</span>
-                  <span className="text-[10px] opacity-75 font-mono">({conteoPorFormato.PDF})</span>
+                  <span className="text-[10px] opacity-80 font-mono">({conteoPorFormato.PDF})</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setFiltroFormato('EXCEL')}
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs ${
                     filtroFormato === 'EXCEL'
-                      ? 'bg-emerald-500 text-zinc-950 shadow-md font-black ring-2 ring-emerald-400/50'
-                      : 'bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40 border border-emerald-500/30'
+                      ? 'bg-emerald-600 text-white shadow-md font-black ring-2 ring-emerald-400'
+                      : 'bg-emerald-50 text-emerald-900 hover:bg-emerald-100 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-500/40 font-bold'
                   }`}
                 >
-                  <FileSpreadsheet className="w-3 h-3 text-emerald-400" />
+                  <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>Excel</span>
-                  <span className="text-[10px] opacity-75 font-mono">({conteoPorFormato.EXCEL})</span>
+                  <span className="text-[10px] opacity-80 font-mono">({conteoPorFormato.EXCEL})</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setFiltroFormato('WORD')}
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs ${
                     filtroFormato === 'WORD'
-                      ? 'bg-blue-600 text-white shadow-md font-black ring-2 ring-blue-400/50'
-                      : 'bg-blue-950/30 text-blue-300 hover:bg-blue-900/40 border border-blue-500/30'
+                      ? 'bg-blue-600 text-white shadow-md font-black ring-2 ring-blue-400'
+                      : 'bg-blue-50 text-blue-900 hover:bg-blue-100 border border-blue-300 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-500/40 font-bold'
                   }`}
                 >
-                  <File className="w-3 h-3 text-blue-400" />
+                  <File className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                   <span>Word</span>
-                  <span className="text-[10px] opacity-75 font-mono">({conteoPorFormato.WORD})</span>
+                  <span className="text-[10px] opacity-80 font-mono">({conteoPorFormato.WORD})</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setFiltroFormato('IMAGEN')}
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs ${
                     filtroFormato === 'IMAGEN'
-                      ? 'bg-purple-600 text-white shadow-md font-black ring-2 ring-purple-400/50'
-                      : 'bg-purple-950/30 text-purple-300 hover:bg-purple-900/40 border border-purple-500/30'
+                      ? 'bg-purple-600 text-white shadow-md font-black ring-2 ring-purple-400'
+                      : 'bg-purple-50 text-purple-900 hover:bg-purple-100 border border-purple-300 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-500/40 font-bold'
                   }`}
                 >
-                  <ImageIcon className="w-3 h-3 text-purple-400" />
+                  <ImageIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                   <span>Imagen</span>
-                  <span className="text-[10px] opacity-75 font-mono">({conteoPorFormato.IMAGEN})</span>
+                  <span className="text-[10px] opacity-80 font-mono">({conteoPorFormato.IMAGEN})</span>
                 </button>
               </div>
             </div>
@@ -845,48 +845,48 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
       )}
 
       {/* BARRA DE ESTADO DE FILTROS APLICADOS Y CONTEO DE RESULTADOS */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-[#242426] p-3 rounded-2xl border border-[#424246]">
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-[#132247] p-3.5 rounded-2xl border border-slate-200 dark:border-[#1e3461] shadow-xs">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-bold text-[#AA9E80] flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-amber-400" />
-            Resultados:
+          <span className="text-xs font-bold text-slate-800 dark:text-slate-300 flex items-center gap-1.5">
+            <Layers className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            Resultados Encontrados:
           </span>
-          <span className="text-xs font-black text-white bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30 font-mono">
+          <span className="text-xs font-black bg-amber-100 text-amber-950 border border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-400/30 px-2.5 py-0.5 rounded-full font-mono shadow-xs">
             {itemsFiltrados.length} documentos
           </span>
 
           {/* Chips de filtros activos */}
           {filtroAnio !== 'TODOS' && (
-            <span className="inline-flex items-center gap-1 text-[11px] bg-[#2B2B2E] text-zinc-200 px-2.5 py-0.5 rounded-full border border-[#424246]">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-slate-100 dark:bg-[#0f1b35] text-slate-900 dark:text-slate-200 px-3 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 shadow-xs">
               Año: <strong>{filtroAnio}</strong>
-              <button type="button" onClick={() => setFiltroAnio('TODOS')} className="text-[#AA9E80] hover:text-white">
+              <button type="button" onClick={() => setFiltroAnio('TODOS')} className="text-slate-500 hover:text-slate-950 dark:hover:text-white cursor-pointer ml-1">
                 <X className="w-3 h-3" />
               </button>
             </span>
           )}
 
           {filtroMes !== 0 && (
-            <span className="inline-flex items-center gap-1 text-[11px] bg-[#2B2B2E] text-zinc-200 px-2.5 py-0.5 rounded-full border border-[#424246]">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-slate-100 dark:bg-[#0f1b35] text-slate-900 dark:text-slate-200 px-3 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 shadow-xs">
               Mes: <strong>{NOMBRES_MESES_COMPLETOS[filtroMes]}</strong>
-              <button type="button" onClick={() => setFiltroMes(0)} className="text-[#AA9E80] hover:text-white">
+              <button type="button" onClick={() => setFiltroMes(0)} className="text-slate-500 hover:text-slate-950 dark:hover:text-white cursor-pointer ml-1">
                 <X className="w-3 h-3" />
               </button>
             </span>
           )}
 
           {filtroFormato !== 'TODOS' && (
-            <span className="inline-flex items-center gap-1 text-[11px] bg-[#2B2B2E] text-zinc-200 px-2.5 py-0.5 rounded-full border border-[#424246]">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-slate-100 dark:bg-[#0f1b35] text-slate-900 dark:text-slate-200 px-3 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 shadow-xs">
               Formato: <strong>{filtroFormato}</strong>
-              <button type="button" onClick={() => setFiltroFormato('TODOS')} className="text-[#AA9E80] hover:text-white">
+              <button type="button" onClick={() => setFiltroFormato('TODOS')} className="text-slate-500 hover:text-slate-950 dark:hover:text-white cursor-pointer ml-1">
                 <X className="w-3 h-3" />
               </button>
             </span>
           )}
 
           {busquedaNombre.trim() !== '' && (
-            <span className="inline-flex items-center gap-1 text-[11px] bg-[#2B2B2E] text-zinc-200 px-2.5 py-0.5 rounded-full border border-[#424246]">
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-slate-100 dark:bg-[#0f1b35] text-slate-900 dark:text-slate-200 px-3 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 shadow-xs">
               Texto: <strong>"{busquedaNombre}"</strong>
-              <button type="button" onClick={() => setBusquedaNombre('')} className="text-[#AA9E80] hover:text-white">
+              <button type="button" onClick={() => setBusquedaNombre('')} className="text-slate-500 hover:text-slate-950 dark:hover:text-white cursor-pointer ml-1">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -897,9 +897,9 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
           <button
             type="button"
             onClick={limpiarTodosLosFiltros}
-            className="text-[11px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 hover:underline cursor-pointer"
+            className="text-xs text-amber-800 hover:text-amber-950 dark:text-amber-400 dark:hover:text-amber-300 font-black flex items-center gap-1 hover:underline cursor-pointer"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RotateCcw className="w-3.5 h-3.5" />
             <span>Restablecer filtros</span>
           </button>
         )}
@@ -907,71 +907,71 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
 
       {/* GRID DE RESULTADOS INTELIGENTES ENCONTRADOS */}
       {itemsFiltrados.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 max-h-[460px] overflow-y-auto pr-1 scrollbar-thin">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[480px] overflow-y-auto pr-1 scrollbar-thin">
           {itemsFiltrados.map((item) => {
             const esSeleccionado = item.fichaId && item.fichaId === fichaSeleccionadaId;
 
             return (
               <div
                 key={item.id}
-                className={`p-4 rounded-2xl border transition-all flex flex-col justify-between gap-3 text-[#FBF8F2] relative ${
+                className={`p-4 rounded-2xl border transition-all flex flex-col justify-between gap-3 text-slate-900 dark:text-[#FBF8F2] relative shadow-xs ${
                   esSeleccionado
-                    ? 'bg-gradient-to-b from-[#343126] to-[#2B2B2E] border-amber-400/80 shadow-lg shadow-amber-500/10 ring-1 ring-amber-400/60'
-                    : 'bg-[#2B2B2E] hover:bg-[#323236] border-[#424246]'
+                    ? 'bg-amber-50/70 border-2 border-amber-500 shadow-md ring-2 ring-amber-400/40 dark:bg-[#1b2b52] dark:border-amber-400'
+                    : 'bg-white hover:bg-slate-50/80 border border-slate-200 hover:border-amber-400 dark:bg-[#0f1b35] dark:hover:bg-[#132247] dark:border-[#1e3461]'
                 }`}
               >
                 {/* Cabecera de la tarjeta: Formato + Fecha + Origen */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1.5">
                     {renderBadgeFormato(item.formato)}
-                    <span className="text-[10px] bg-[#242426] text-amber-300/90 font-mono px-2 py-0.5 rounded-md border border-[#424246]">
+                    <span className="text-[10px] bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-amber-300 font-mono font-bold px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
                       {item.fechaDisplay}
                     </span>
                   </div>
 
                   {item.origen === 'FICHA_REGISTRADA' ? (
-                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    <span className="text-[10px] bg-emerald-100 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-300 font-black px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-500/30">
                       Registrada STF
                     </span>
                   ) : (
-                    <span className="text-[9px] bg-blue-500/20 text-blue-300 font-bold px-2 py-0.5 rounded-full border border-blue-500/30 flex items-center gap-1">
-                      <HardDrive className="w-2.5 h-2.5 text-blue-400" /> Drive Lab
+                    <span className="text-[10px] bg-blue-100 text-blue-900 dark:bg-blue-500/20 dark:text-blue-300 font-black px-2 py-0.5 rounded-full border border-blue-300 dark:border-blue-500/30 flex items-center gap-1">
+                      <HardDrive className="w-2.5 h-2.5 text-blue-600 dark:text-blue-400" /> Drive Lab
                     </span>
                   )}
                 </div>
 
                 {/* Contenido principal: Nombre de tela y Ficha técnica */}
                 <div className="space-y-1">
-                  <h4 className="text-sm font-black text-white uppercase tracking-wide line-clamp-1 text-[#FBF8F2]" title={item.nombreTela}>
+                  <h4 className="text-sm font-black text-slate-950 dark:text-white uppercase tracking-wide line-clamp-1" title={item.nombreTela}>
                     {item.nombreTela}
                   </h4>
                   
-                  <div className="text-xs text-[#C6A466] font-semibold flex items-center gap-1 truncate" title={item.telaFichaTecnica}>
-                    <Tag className="w-3 h-3 shrink-0" />
+                  <div className="text-xs text-amber-800 dark:text-amber-400 font-bold flex items-center gap-1 truncate" title={item.telaFichaTecnica}>
+                    <Tag className="w-3.5 h-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
                     <span>Ficha: {item.telaFichaTecnica}</span>
                   </div>
 
-                  <p className="text-[11px] text-[#AA9E80] truncate">
-                    Proveedor: <strong className="text-zinc-300">{item.proveedor}</strong> {item.paisOrigen ? `• ${item.paisOrigen}` : ''}
+                  <p className="text-[11px] text-slate-700 dark:text-slate-300 font-medium truncate">
+                    Proveedor: <strong className="text-slate-950 dark:text-white font-black">{item.proveedor}</strong> {item.paisOrigen ? `• ${item.paisOrigen}` : ''}
                   </p>
 
                   {item.composicion && (
-                    <p className="text-[10px] text-zinc-400 truncate font-mono">
+                    <p className="text-[10px] text-slate-600 dark:text-slate-400 truncate font-mono">
                       Comp: {item.composicion} {item.gramajeGsm ? `• ${item.gramajeGsm} gsm` : ''}
                     </p>
                   )}
                 </div>
 
                 {/* Botones de acción inferior */}
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#424246]/60">
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200 dark:border-[#1e3461]">
                   {item.fichaId ? (
                     <button
                       type="button"
                       onClick={() => onSeleccionarFicha(item.fichaId!)}
-                      className={`w-full py-1.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      className={`w-full py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
                         esSeleccionado
-                          ? 'bg-amber-400 text-zinc-950 shadow-md font-black'
-                          : 'bg-[#38383C] hover:bg-amber-500 hover:text-zinc-950 text-zinc-200 border border-[#424246]'
+                          ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                          : 'bg-slate-100 hover:bg-amber-500 hover:text-slate-950 text-slate-900 border border-slate-300 dark:bg-slate-800 dark:hover:bg-amber-500 dark:hover:text-slate-950 dark:text-slate-200 dark:border-slate-700'
                       }`}
                     >
                       <Eye className="w-3.5 h-3.5" />
@@ -982,11 +982,11 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
                       href={item.enlaceDrive || CARPETA_OFICIAL_DRIVE_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-1.5 px-3 rounded-xl text-xs font-bold bg-blue-900/40 hover:bg-blue-800/60 text-blue-200 border border-blue-500/40 transition-all flex items-center justify-center gap-1.5"
+                      className="w-full py-2 px-3 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 dark:bg-blue-900/40 dark:hover:bg-blue-800/60 dark:text-blue-200 dark:border-blue-500/40 transition-all flex items-center justify-center gap-1.5 shadow-xs"
                     >
-                      <HardDrive className="w-3.5 h-3.5 text-blue-400" />
+                      <HardDrive className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                       <span>Abrir en Google Drive</span>
-                      <ExternalLink className="w-3 h-3 opacity-70" />
+                      <ExternalLink className="w-3 h-3 opacity-75" />
                     </a>
                   )}
 
@@ -994,7 +994,7 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
                     <button
                       type="button"
                       onClick={onAbrirLecturaDrive}
-                      className="p-1.5 rounded-xl bg-amber-500/20 text-amber-300 hover:bg-amber-500 hover:text-zinc-950 border border-amber-400/40 transition-all cursor-pointer shrink-0"
+                      className="p-2 rounded-xl bg-amber-50 text-amber-900 hover:bg-amber-500 hover:text-slate-950 border border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-400/40 transition-all cursor-pointer shrink-0 shadow-xs"
                       title="Procesar este documento con Lectura Inteligente IA"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
@@ -1007,17 +1007,17 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
         </div>
       ) : (
         /* ESTADO VACÍO (CERO COINCIDENCIAS) */
-        <div className="p-8 text-center bg-[#242426] rounded-2xl border border-[#424246] space-y-3">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-[#2D2D30] text-[#AA9E80] flex items-center justify-center border border-[#424246]">
-            <Search className="w-6 h-6 text-amber-400/70" />
+        <div className="p-8 text-center bg-white dark:bg-[#132247] rounded-2xl border border-slate-200 dark:border-[#1e3461] space-y-3">
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-white dark:bg-[#0f1b35] text-slate-400 flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-xs">
+            <Search className="w-6 h-6 text-amber-500" />
           </div>
           <div className="space-y-1">
-            <h5 className="text-sm font-bold text-white uppercase tracking-wide">
+            <h5 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
               No se encontraron documentos coincidentes
             </h5>
-            <p className="text-xs text-[#AA9E80] max-w-md mx-auto">
+            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto">
               No hay telas ni fichas registradas para el período{' '}
-              <strong className="text-amber-300">
+              <strong className="text-amber-700 dark:text-amber-300 font-bold">
                 {filtroMes === 0 ? '' : `${NOMBRES_MESES_COMPLETOS[filtroMes]} `}
                 {filtroAnio === 'TODOS' ? 'de todos los años' : filtroAnio}
               </strong>
@@ -1028,7 +1028,7 @@ export const PanelBusquedaInteligenteDrive: React.FC<PanelBusquedaInteligenteDri
           <button
             type="button"
             onClick={limpiarTodosLosFiltros}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#C6A466] text-[#2B2B2E] hover:bg-[#D6CDB8] transition-all cursor-pointer shadow-md"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition-all cursor-pointer shadow-md"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Ver todos los documentos disponibles</span>

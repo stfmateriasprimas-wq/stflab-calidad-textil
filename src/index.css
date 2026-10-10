@@ -231,6 +231,8 @@ html.dark .bg-\[\#2B2B2E\],
 html.dark .bg-\[\#2D2D30\],
 html.dark .bg-\[\#1E1E21\],
 html.dark .bg-\[\#252528\],
+html.dark .bg-\[\#262629\],
+html.dark .bg-\[\#242426\],
 html.dark .bg-gray-50,
 html.dark .bg-slate-50,
 html.dark .bg-slate-100,
@@ -405,75 +407,80 @@ html.light aside [data-active="true"] svg {
    ========================================================= */
 
 /* 1. REGLA FUNDAMENTAL: Todo lo que esté sobre FONDO OSCURO debe tener LETRAS BLANCAS / CLARAS */
-/* Aplica en cualquier modo y tiene prioridad sobre contenedores padres claros */
-.dark-surface,
-[class*="bg-slate-900"],
-[class*="bg-slate-950"],
-[class*="bg-[#120F0D]"],
-[class*="bg-[#0b1329]"],
-[class*="bg-[#0f1b35]"],
-[class*="bg-[#132247]"],
-[class*="bg-[#1C1A16]"],
-[class*="bg-[#1A1A1C]"],
-[class*="bg-[#080e1e]"],
-[class*="from-slate-900"],
-[class*="from-indigo-950"],
-[class*="via-indigo-950"],
-[class*="from-blue-950"] {
+/* Aplica en modo oscuro activo o sobre botones/elementos explícitamente oscuros */
+html.dark .dark-surface,
+html.dark [class*="bg-slate-900"],
+html.dark [class*="bg-slate-950"],
+html.dark [class*="bg-[#120F0D]"],
+html.dark [class*="bg-[#0b1329]"],
+html.dark [class*="bg-[#0f1b35]"],
+html.dark [class*="bg-[#132247]"],
+html.dark [class*="bg-[#1C1A16]"],
+html.dark [class*="bg-[#1A1A1C]"],
+html.dark [class*="bg-[#080e1e]"],
+html.dark [class*="from-slate-900"],
+html.dark [class*="from-indigo-950"],
+html.dark [class*="via-indigo-950"],
+html.dark [class*="from-blue-950"],
+html.light .bg-slate-900,
+html.light .bg-slate-950,
+html.light .bg-black {
   color: #f8fafc;
 }
 
 /* Títulos sobre fondo oscuro SIEMPRE blancos con máxima prioridad */
-[class*="bg-slate-900"] h1, [class*="bg-slate-900"] h2, [class*="bg-slate-900"] h3, [class*="bg-slate-900"] h4, [class*="bg-slate-900"] h5, [class*="bg-slate-900"] h6,
-[class*="bg-slate-950"] h1, [class*="bg-slate-950"] h2, [class*="bg-slate-950"] h3, [class*="bg-slate-950"] h4, [class*="bg-slate-950"] h5, [class*="bg-slate-950"] h6,
-[class*="bg-[#120F0D]"] h1, [class*="bg-[#120F0D]"] h2, [class*="bg-[#120F0D]"] h3, [class*="bg-[#120F0D]"] h4, [class*="bg-[#120F0D]"] h5, [class*="bg-[#120F0D]"] h6,
-[class*="bg-[#0b1329]"] h1, [class*="bg-[#0b1329]"] h2, [class*="bg-[#0b1329]"] h3, [class*="bg-[#0b1329]"] h4, [class*="bg-[#0b1329]"] h5, [class*="bg-[#0b1329]"] h6,
-[class*="bg-[#0f1b35]"] h1, [class*="bg-[#0f1b35]"] h2, [class*="bg-[#0f1b35]"] h3, [class*="bg-[#0f1b35]"] h4, [class*="bg-[#0f1b35]"] h5, [class*="bg-[#0f1b35]"] h6,
-[class*="bg-[#132247]"] h1, [class*="bg-[#132247]"] h2, [class*="bg-[#132247]"] h3, [class*="bg-[#132247]"] h4, [class*="bg-[#132247]"] h5, [class*="bg-[#132247]"] h6,
-[class*="bg-[#1C1A16]"] h1, [class*="bg-[#1C1A16]"] h2, [class*="bg-[#1C1A16]"] h3, [class*="bg-[#1C1A16]"] h4, [class*="bg-[#1C1A16]"] h5, [class*="bg-[#1C1A16]"] h6,
-[class*="bg-[#1A1A1C]"] h1, [class*="bg-[#1A1A1C]"] h2, [class*="bg-[#1A1A1C]"] h3, [class*="bg-[#1A1A1C]"] h4, [class*="bg-[#1A1A1C]"] h5, [class*="bg-[#1A1A1C]"] h6,
-[class*="bg-[#080e1e]"] h1, [class*="bg-[#080e1e]"] h2, [class*="bg-[#080e1e]"] h3, [class*="bg-[#080e1e]"] h4, [class*="bg-[#080e1e]"] h5, [class*="bg-[#080e1e]"] h6,
-[class*="from-slate-900"] h1, [class*="from-slate-900"] h2, [class*="from-slate-900"] h3, [class*="from-slate-900"] h4,
-[class*="from-indigo-950"] h1, [class*="from-indigo-950"] h2, [class*="from-indigo-950"] h3, [class*="from-indigo-950"] h4,
-[class*="via-indigo-950"] h1, [class*="via-indigo-950"] h2, [class*="via-indigo-950"] h3, [class*="via-indigo-950"] h4 {
+html.dark [class*="bg-slate-900"] h1, html.dark [class*="bg-slate-900"] h2, html.dark [class*="bg-slate-900"] h3, html.dark [class*="bg-slate-900"] h4, html.dark [class*="bg-slate-900"] h5, html.dark [class*="bg-slate-900"] h6,
+html.dark [class*="bg-slate-950"] h1, html.dark [class*="bg-slate-950"] h2, html.dark [class*="bg-slate-950"] h3, html.dark [class*="bg-slate-950"] h4, html.dark [class*="bg-slate-950"] h5, html.dark [class*="bg-slate-950"] h6,
+html.dark [class*="bg-[#120F0D]"] h1, html.dark [class*="bg-[#120F0D]"] h2, html.dark [class*="bg-[#120F0D]"] h3, html.dark [class*="bg-[#120F0D]"] h4, html.dark [class*="bg-[#120F0D]"] h5, html.dark [class*="bg-[#120F0D]"] h6,
+html.dark [class*="bg-[#0b1329]"] h1, html.dark [class*="bg-[#0b1329]"] h2, html.dark [class*="bg-[#0b1329]"] h3, html.dark [class*="bg-[#0b1329]"] h4, html.dark [class*="bg-[#0b1329]"] h5, html.dark [class*="bg-[#0b1329]"] h6,
+html.dark [class*="bg-[#0f1b35]"] h1, html.dark [class*="bg-[#0f1b35]"] h2, html.dark [class*="bg-[#0f1b35]"] h3, html.dark [class*="bg-[#0f1b35]"] h4, html.dark [class*="bg-[#0f1b35]"] h5, html.dark [class*="bg-[#0f1b35]"] h6,
+html.dark [class*="bg-[#132247]"] h1, html.dark [class*="bg-[#132247]"] h2, html.dark [class*="bg-[#132247]"] h3, html.dark [class*="bg-[#132247]"] h4, html.dark [class*="bg-[#132247]"] h5, html.dark [class*="bg-[#132247]"] h6,
+html.dark [class*="bg-[#1C1A16]"] h1, html.dark [class*="bg-[#1C1A16]"] h2, html.dark [class*="bg-[#1C1A16]"] h3, html.dark [class*="bg-[#1C1A16]"] h4, html.dark [class*="bg-[#1C1A16]"] h5, html.dark [class*="bg-[#1C1A16]"] h6,
+html.dark [class*="bg-[#1A1A1C]"] h1, html.dark [class*="bg-[#1A1A1C]"] h2, html.dark [class*="bg-[#1A1A1C]"] h3, html.dark [class*="bg-[#1A1A1C]"] h4, html.dark [class*="bg-[#1A1A1C]"] h5, html.dark [class*="bg-[#1A1A1C]"] h6,
+html.dark [class*="bg-[#080e1e]"] h1, html.dark [class*="bg-[#080e1e]"] h2, html.dark [class*="bg-[#080e1e]"] h3, html.dark [class*="bg-[#080e1e]"] h4, html.dark [class*="bg-[#080e1e]"] h5, html.dark [class*="bg-[#080e1e]"] h6,
+html.dark [class*="from-slate-900"] h1, html.dark [class*="from-slate-900"] h2, html.dark [class*="from-slate-900"] h3, html.dark [class*="from-slate-900"] h4,
+html.dark [class*="from-indigo-950"] h1, html.dark [class*="from-indigo-950"] h2, html.dark [class*="from-indigo-950"] h3, html.dark [class*="from-indigo-950"] h4,
+html.dark [class*="via-indigo-950"] h1, html.dark [class*="via-indigo-950"] h2, html.dark [class*="via-indigo-950"] h3, html.dark [class*="via-indigo-950"] h4,
+html.light .bg-slate-900 h1, html.light .bg-slate-900 h2, html.light .bg-slate-900 h3,
+html.light .bg-slate-950 h1, html.light .bg-slate-950 h2, html.light .bg-slate-950 h3 {
   color: #ffffff !important;
 }
 
 /* Spans dentro de títulos oscuros deben heredar blanco, excepto badges específicos */
-[class*="bg-slate-900"] h1 > span:not([class*="bg-"]), [class*="bg-slate-900"] h2 > span:not([class*="bg-"]), [class*="bg-slate-900"] h3 > span:not([class*="bg-"]),
-[class*="bg-slate-950"] h1 > span:not([class*="bg-"]), [class*="bg-slate-950"] h2 > span:not([class*="bg-"]), [class*="bg-slate-950"] h3 > span:not([class*="bg-"]),
-[class*="bg-[#120F0D]"] h1 > span:not([class*="bg-"]), [class*="bg-[#120F0D]"] h2 > span:not([class*="bg-"]), [class*="bg-[#120F0D]"] h3 > span:not([class*="bg-"]),
-[class*="bg-[#0b1329]"] h1 > span:not([class*="bg-"]), [class*="bg-[#0b1329]"] h2 > span:not([class*="bg-"]), [class*="bg-[#0b1329]"] h3 > span:not([class*="bg-"]),
-[class*="bg-[#0f1b35]"] h1 > span:not([class*="bg-"]), [class*="bg-[#0f1b35]"] h2 > span:not([class*="bg-"]), [class*="bg-[#0f1b35]"] h3 > span:not([class*="bg-"]),
-[class*="from-slate-900"] h1 > span:not([class*="bg-"]), [class*="from-slate-900"] h2 > span:not([class*="bg-"]), [class*="from-slate-900"] h3 > span:not([class*="bg-"]) {
+html.dark [class*="bg-slate-900"] h1 > span:not([class*="bg-"]), html.dark [class*="bg-slate-900"] h2 > span:not([class*="bg-"]), html.dark [class*="bg-slate-900"] h3 > span:not([class*="bg-"]),
+html.dark [class*="bg-slate-950"] h1 > span:not([class*="bg-"]), html.dark [class*="bg-slate-950"] h2 > span:not([class*="bg-"]), html.dark [class*="bg-slate-950"] h3 > span:not([class*="bg-"]),
+html.dark [class*="bg-[#120F0D]"] h1 > span:not([class*="bg-"]), html.dark [class*="bg-[#120F0D]"] h2 > span:not([class*="bg-"]), html.dark [class*="bg-[#120F0D]"] h3 > span:not([class*="bg-"]),
+html.dark [class*="bg-[#0b1329]"] h1 > span:not([class*="bg-"]), html.dark [class*="bg-[#0b1329]"] h2 > span:not([class*="bg-"]), html.dark [class*="bg-[#0b1329]"] h3 > span:not([class*="bg-"]),
+html.dark [class*="bg-[#0f1b35]"] h1 > span:not([class*="bg-"]), html.dark [class*="bg-[#0f1b35]"] h2 > span:not([class*="bg-"]), html.dark [class*="bg-[#0f1b35]"] h3 > span:not([class*="bg-"]),
+html.dark [class*="from-slate-900"] h1 > span:not([class*="bg-"]), html.dark [class*="from-slate-900"] h2 > span:not([class*="bg-"]), html.dark [class*="from-slate-900"] h3 > span:not([class*="bg-"]) {
   color: #ffffff !important;
 }
 
-/* Subtítulos y descripciones sobre fondo oscuro SIEMPRE claros */
-[class*="bg-slate-900"] p, [class*="bg-slate-950"] p,
-[class*="bg-[#120F0D]"] p, [class*="bg-[#0b1329]"] p,
-[class*="bg-[#0f1b35]"] p, [class*="bg-[#132247]"] p,
-[class*="bg-[#1C1A16]"] p, [class*="bg-[#1A1A1C]"] p,
-[class*="bg-[#080e1e]"] p,
-[class*="from-slate-900"] p,
-[class*="via-indigo-950"] p {
+/* Subtítulos y descripciones sobre fondo oscuro SIEMPRE claros en modo oscuro */
+html.dark [class*="bg-slate-900"] p, html.dark [class*="bg-slate-950"] p,
+html.dark [class*="bg-[#120F0D]"] p, html.dark [class*="bg-[#0b1329]"] p,
+html.dark [class*="bg-[#0f1b35]"] p, html.dark [class*="bg-[#132247]"] p,
+html.dark [class*="bg-[#1C1A16]"] p, html.dark [class*="bg-[#1A1A1C]"] p,
+html.dark [class*="bg-[#080e1e]"] p,
+html.dark [class*="from-slate-900"] p,
+html.dark [class*="via-indigo-950"] p {
   color: #cbd5e1 !important;
 }
 
 /* 2. REGLA FUNDAMENTAL: Todo lo que esté sobre FONDO BLANCO / CLARO debe tener LETRAS OSCURAS */
-html.light .bg-white:not([class*="bg-slate-9"]):not([class*="bg-[#120"]):not([class*="bg-[#0b1"]):not([class*="bg-[#0f1"]):not([class*="from-slate-9"]):not([class*="via-indigo-9"]),
-html.light .bg-slate-50:not([class*="bg-slate-9"]):not([class*="bg-[#120"]):not([class*="bg-[#0b1"]):not([class*="bg-[#0f1"]):not([class*="from-slate-9"]):not([class*="via-indigo-9"]),
-html.light .bg-slate-100:not([class*="bg-slate-9"]):not([class*="bg-[#120"]):not([class*="bg-[#0b1"]):not([class*="bg-[#0f1"]):not([class*="from-slate-9"]):not([class*="via-indigo-9"]) {
+html.light .bg-white,
+html.light .bg-slate-50,
+html.light .bg-slate-100 {
   color: #0f172a;
 }
 
 /* EN MODO CLARO: TODOS los encabezados de áreas (Corte, Patronaje, Compras, Laboratorio, etc.) deben ser NEGROS (#0f172a) */
-html.light h1:not([class*="bg-slate-9"] *):not([class*="bg-slate-950"] *):not([class*="bg-[#120F0D]"] *):not([class*="from-slate-9"] *):not([class*="via-indigo-950"] *):not(.text-white),
-html.light h2:not([class*="bg-slate-9"] *):not([class*="bg-slate-950"] *):not([class*="bg-[#120F0D]"] *):not([class*="from-slate-9"] *):not([class*="via-indigo-950"] *):not(.text-white),
-html.light h3:not([class*="bg-slate-9"] *):not([class*="bg-slate-950"] *):not([class*="bg-[#120F0D]"] *):not([class*="from-slate-9"] *):not([class*="via-indigo-950"] *):not(.text-white),
-html.light h4:not([class*="bg-slate-9"] *):not([class*="bg-slate-950"] *):not([class*="bg-[#120F0D]"] *):not([class*="from-slate-9"] *):not([class*="via-indigo-950"] *):not(.text-white),
-html.light h5:not([class*="bg-slate-9"] *):not([class*="bg-slate-950"] *):not([class*="bg-[#120F0D]"] *):not([class*="from-slate-9"] *):not([class*="via-indigo-950"] *):not(.text-white),
-html.light h6:not([class*="bg-slate-9"] *):not([class*="bg-slate-950"] *):not([class*="bg-[#120F0D]"] *):not([class*="from-slate-9"] *):not([class*="via-indigo-950"] *):not(.text-white) {
+html.light h1:not(.bg-slate-900 *):not(.bg-black *):not(.text-white),
+html.light h2:not(.bg-slate-900 *):not(.bg-black *):not(.text-white),
+html.light h3:not(.bg-slate-900 *):not(.bg-black *):not(.text-white),
+html.light h4:not(.bg-slate-900 *):not(.bg-black *):not(.text-white),
+html.light h5:not(.bg-slate-900 *):not(.bg-black *):not(.text-white),
+html.light h6:not(.bg-slate-900 *):not(.bg-black *):not(.text-white) {
   color: #0f172a !important;
 }
 
@@ -636,11 +643,18 @@ html.light .bg-indigo-400\/20, html.light .bg-indigo-500\/20 {
   border-color: rgba(79, 70, 229, 0.4) !important;
 }
 
-/* Modos de tarjetas en modo claro */
+/* Modos de tarjetas en modo claro - Todos los apartados en blanco impecable */
 html.light .bg-\[\#2B2B2E\],
 html.light .bg-\[\#2D2D30\],
 html.light .bg-\[\#1E1E21\],
 html.light .bg-\[\#252528\],
+html.light .bg-\[\#262629\],
+html.light .bg-\[\#242426\],
+html.light .bg-\[\#1c1c1e\],
+html.light .bg-\[\#1C1A16\],
+html.light .bg-\[\#18181b\],
+html.light .bg-\[\#1e232f\],
+html.light .bg-\[\#242A38\],
 html.light .bg-\[\#171310\],
 html.light .bg-\[\#3A3A3D\] {
   background-color: #ffffff !important;
