@@ -29,6 +29,7 @@ import {
 import { ExploradorFichasModal } from '../fichas-tecnicas/ExploradorFichasModal';
 import { FichaTecnicaFormatoCompletoModal } from '../fichas-tecnicas/FichaTecnicaFormatoCompletoModal';
 import { ModalLecturaInteligenteDrive } from '../fichas-tecnicas/ModalLecturaInteligenteDrive';
+import { PanelBusquedaInteligenteDrive } from '../fichas-tecnicas/PanelBusquedaInteligenteDrive';
 import { exportarFichaAWord, exportarFichaAPDF } from '../../utils/fichaTecnicaFormatters';
 import { 
   STFGroupDocumentSheet, 
@@ -182,7 +183,7 @@ export const BibliotecaView: React.FC = () => {
       )}
 
       {/* Header Panel Principal */}
-      <div className="bg-[#2D2D30] p-6 rounded-3xl border border-[#424246] shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-[#FBF8F2]">
+      <div className="bg-[#2D2D30] p-6 rounded-3xl border border-[#424246] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-[#FBF8F2]">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-serif font-bold text-[#FBF8F2] tracking-wide uppercase flex items-center">
@@ -195,20 +196,24 @@ export const BibliotecaView: React.FC = () => {
           </p>
         </div>
 
-        {/* Buscador */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#AA9E80]" />
-            <input
-              type="text"
-              placeholder="Buscar referencia o proveedor..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-[#2B2B2E] border border-[#424246] rounded-xl text-xs text-[#FBF8F2] placeholder-[#AA9E80]/50 focus:outline-none focus:border-[#C6A466] w-full sm:w-64"
-            />
-          </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs bg-amber-500/15 text-amber-300 font-bold px-3 py-1.5 rounded-xl border border-amber-400/30 flex items-center gap-1.5 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>{fichasTecnicasHistorial.length} Fichas en Base Oficial</span>
+          </span>
         </div>
       </div>
+
+      {/* APARTADO INTELIGENTE: Calendario (Año/Mes), Búsqueda por Nombre de Tela o Ficha, Formato de Documento y Drive */}
+      <PanelBusquedaInteligenteDrive
+        fichas={fichasTecnicasHistorial}
+        fichaSeleccionadaId={selectedFichaId || currentFicha?.id || ''}
+        onSeleccionarFicha={(fichaId) => {
+          setSelectedFichaId(fichaId);
+          triggerToast('Ficha técnica seleccionada y cargada en el formato oficial.');
+        }}
+        onAbrirLecturaDrive={() => setIsModalLecturaDriveOpen(true)}
+      />
 
       {/* Selector rápido de Fichas Técnicas en Base de Datos */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
